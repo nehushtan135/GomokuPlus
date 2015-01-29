@@ -1,0 +1,39 @@
+<resources>
+
+    <!-- Base application theme. -->
+    <style name="customTheme" parent="android:Theme.Holo.Light.DarkActionBar">
+        <!-- Customize your theme here. -->
+        <item name="android:windowBackground">@color/backgroundBlue</item>
+        <item name="android:shadowColor">#000000</item>
+        <item name="android:shadowDx">1</item>
+        <item name="android:shadowDy">1</item>
+        <item name="android:shadowRadius">0.6</item>
+
+    </style>
+
+    <!-- code came from: http://www.mindfreakerstuff.com/2012/09/50-useful-android-custom-button-style-set-1/#genoa -->
+    <style name="btnStyleGenoa" parent="@android:style/Widget.Button">
+    <item name="android:textSize">15sp</item>
+    <item name="android:textStyle">bold</item>
+    <item name="android:textColor">#FFFFFF</item>
+    <item name="android:gravity">center</item>
+    <item name="android:shadowColor">#000000</item>
+    <item name="android:shadowDx">1</item>
+    <item name="android:shadowDy">1</item>
+    <item name="android:shadowRadius">0.6</item>
+    <item name="android:background">@drawable/custom_btn_genoa</item>
+</style>
+    <style name="GenoaTextStyle" parent="@android:style/Widget.Button">
+        <item name="android:textSize">15sp</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:textColor">#FFFFFF</item>
+        <item name="android:gravity">center</item>
+        <item name="android:shadowColor">#000000</item>
+        <item name="android:shadowDx">1</item>
+        <item name="android:shadowDy">1</item>
+        <item name="android:shadowRadius">0.6</item>
+        <item name="android:background">@drawable/genoa_text</item>
+    </style>
+    <color name="backgroundBlue">#144248</color>
+    <color name="black">#add8e6</color>
+</resources>

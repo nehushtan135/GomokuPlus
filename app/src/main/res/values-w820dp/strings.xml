@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="settingButtonString">Settings</string>
+    <string name="newGameButton">New Game</string>
+    <string name="helpButton">Help</string>
+    <string name="aboutButton">About</string>
+</resources>

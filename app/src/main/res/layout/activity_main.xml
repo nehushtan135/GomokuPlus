@@ -1,0 +1,92 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools" android:layout_width="match_parent"
+    android:layout_height="fill_parent"
+    tools:context=".MainActivity"
+    style="@style/customTheme">
+
+    <!-- to be done later I want to add the icon to the top center of the screen and reduce the size a little-->
+    <ImageView
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:contentDescription="main_screen"
+        android:src="@drawable/gomoku_main"
+        android:id="@+id/main_image"
+        android:adjustViewBounds="false"
+        android:cropToPadding="false"
+        android:focusable="false"
+        android:padding="@dimen/topBuffer"
+        android:layout_above="@+id/newGameButton"
+        android:layout_centerHorizontal="true"
+        android:scaleType="centerCrop" />
+
+
+    <Button
+        style="@style/btnStyleGenoa"
+        android:text="@string/newGameButton"
+        android:id="@+id/newGameButton"
+        android:paddingLeft="@dimen/ButtonBuffer"
+        android:paddingRight="@dimen/ButtonBuffer"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_centerVertical="true"
+        android:layout_centerHorizontal="true"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginLeft="@dimen/ButtonBuffer"
+        android:layout_marginRight="@dimen/ButtonBuffer"
+        android:layout_marginBottom="@dimen/ButtonBuffer"
+        android:onClick="onNewGameClick" />
+
+    <Button
+        style="@style/btnStyleGenoa"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/settingButtonString"
+        android:id="@+id/settingsButton"
+        android:layout_centerHorizontal="true"
+        android:layout_centerVertical="true"
+        android:layout_below="@id/newGameButton"
+        android:paddingLeft="@dimen/ButtonBuffer"
+        android:paddingRight="@dimen/ButtonBuffer"
+        android:theme="@style/btnStyleGenoa"
+        android:layout_marginLeft="@dimen/ButtonBuffer"
+        android:layout_marginRight="@dimen/ButtonBuffer"
+        android:layout_marginBottom="@dimen/ButtonBuffer"
+        android:onClick="onSettingClick"
+        />
+
+
+    <Button
+        style="@style/btnStyleGenoa"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_centerVertical="true"
+        android:layout_below="@id/settingsButton"
+
+        android:paddingLeft="@dimen/ButtonBuffer"
+        android:paddingRight="@dimen/ButtonBuffer"
+        android:theme="@style/btnStyleGenoa"
+        android:layout_marginLeft="@dimen/ButtonBuffer"
+        android:layout_marginRight="@dimen/ButtonBuffer"
+        android:text="@string/helpButton"
+        android:onClick="onHelpClick"
+        android:id="@+id/helpButton"
+        android:layout_marginBottom="@dimen/ButtonBuffer" />
+
+
+    <Button
+        style="@style/btnStyleGenoa"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/aboutButton"
+        android:id="@+id/aboutButton"
+        android:layout_centerHorizontal="true"
+        android:layout_centerVertical="true"
+        android:layout_below="@id/helpButton"
+        android:paddingLeft="@dimen/ButtonBuffer"
+        android:paddingRight="@dimen/ButtonBuffer"
+        android:theme="@style/btnStyleGenoa"
+        android:layout_marginLeft="@dimen/ButtonBuffer"
+        android:onClick="onAboutClick"
+        android:layout_marginRight="@dimen/ButtonBuffer"></Button>
+</RelativeLayout>

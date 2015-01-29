@@ -1,0 +1,79 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools" android:layout_width="match_parent"
+    android:layout_height="match_parent" android:paddingLeft="@dimen/activity_horizontal_margin"
+    android:paddingRight="@dimen/activity_horizontal_margin"
+    android:paddingTop="@dimen/activity_vertical_margin"
+    android:paddingBottom="@dimen/activity_vertical_margin" tools:context="group7.gomoku.NewGame">
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="70dp"
+        style="@style/GenoaTextStyle"
+        android:id="@+id/textView2"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="false"
+        android:layout_alignRight="@+id/btn_mute"
+        android:layout_alignEnd="@+id/btn_mute"
+        android:singleLine="true" />
+
+
+    <TextView
+        android:id="@+id/textViewTime"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textColor="#ffffff"
+        android:layout_alignParentTop="true"
+        android:layout_toStartOf="@+id/btnPass"
+        android:textSize="35sp"
+        android:layout_marginRight="10dp"
+        android:layout_marginTop="10dp" />
+        <!--android:layout_marginLeft="10dp"--> />
+
+
+
+    <ImageButton
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/btn_pause"
+        android:src="@drawable/pause"
+        android:background="@null"
+        android:layout_alignTop="@+id/textViewTime"
+        android:layout_alignBottom="@+id/btnPass" />
+        <!--android:onClick="PauseGame"-->
+
+
+    <Button
+        android:id="@+id/btnPass"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/passString"
+        style="@style/GenoaTextStyle"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentStart="false"
+        android:textSize="25sp"
+        android:layout_marginRight="10dp"
+        android:layout_marginTop="10dp" />
+
+    <ImageView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/imageBoard"
+        android:src="@drawable/board10"
+        android:scaleType="fitCenter"
+        android:layout_alignParentBottom="true"
+        android:layout_alignRight="@+id/btnPass"
+        android:layout_alignEnd="@+id/btnPass"
+        android:layout_below="@+id/textView2" />
+
+    <RelativeLayout
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:layout_alignParentBottom="true"
+        android:layout_toEndOf="@+id/btn_pause"
+        android:layout_alignTop="@+id/imageBoard"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:id="@+id/boardLayout"></RelativeLayout>
+
+
+</RelativeLayout>
