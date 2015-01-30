@@ -19,7 +19,7 @@ public class ServiceAudioPlay extends Service {
 	public void onCreate(){
 	    super.onCreate();
 	    audioPlayer = MediaPlayer.create(this, R.raw.blobbitfinal);
-        //audioPlayer.setLooping(true);
+        audioPlayer.setLooping(true);
 
 	}
 

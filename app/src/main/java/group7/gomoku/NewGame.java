@@ -1,6 +1,7 @@
 package group7.gomoku;
 
 import android.app.Activity;
+import android.app.Dialog;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -19,7 +20,7 @@ import android.view.View.OnClickListener;
 import java.util.concurrent.TimeUnit;
 
 
-public class NewGame extends Activity {
+public class NewGame extends MainActivity {
 
     Button btnPass;
     TextView textViewTime;
@@ -54,7 +55,8 @@ public class NewGame extends Activity {
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_new_game, menu);
+        //getMenuInflater().inflate(R.menu.menu_new_game, menu);
+        super.onCreateOptionsMenu(menu);
         return true;
     }
 

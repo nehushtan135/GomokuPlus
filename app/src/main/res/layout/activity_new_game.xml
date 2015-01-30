@@ -38,8 +38,8 @@
         android:src="@drawable/pause"
         android:background="@null"
         android:layout_alignTop="@+id/textViewTime"
-        android:layout_alignBottom="@+id/btnPass" />
-        <!--android:onClick="PauseGame"-->
+        android:layout_alignBottom="@+id/btnPass"
+        android:onClick="PauseGame"/>
 
 
     <Button

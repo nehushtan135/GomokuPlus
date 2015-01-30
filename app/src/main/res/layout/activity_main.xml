@@ -14,7 +14,7 @@
         android:adjustViewBounds="false"
         android:cropToPadding="false"
         android:focusable="false"
-        android:padding="@dimen/topBuffer"
+        android:padding="@dimen/abc_action_bar_subtitle_bottom_margin_material"
         android:layout_above="@+id/newGameButton"
         android:layout_centerHorizontal="true"
         android:scaleType="centerCrop" />
@@ -88,5 +88,25 @@
         android:theme="@style/btnStyleGenoa"
         android:layout_marginLeft="@dimen/ButtonBuffer"
         android:onClick="onAboutClick"
-        android:layout_marginRight="@dimen/ButtonBuffer"></Button>
+        android:layout_marginRight="@dimen/ButtonBuffer" />
+
+    <Button
+        style="@style/btnStyleGenoa"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/exitButton"
+        android:id="@+id/exitButton"
+        android:layout_centerHorizontal="true"
+        android:layout_centerVertical="true"
+        android:paddingLeft="@dimen/ButtonBuffer"
+        android:paddingRight="@dimen/ButtonBuffer"
+        android:theme="@style/btnStyleGenoa"
+        android:onClick="onExitClick"
+        android:layout_below="@+id/aboutButton"
+        android:layout_marginLeft="@dimen/ButtonBuffer"
+        android:layout_marginRight="@dimen/ButtonBuffer"
+        android:layout_marginBottom="@dimen/ButtonBuffer"
+        android:layout_marginTop="@dimen/ButtonBuffer" />
+
+
 </RelativeLayout>

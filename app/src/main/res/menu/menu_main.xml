@@ -1,6 +1,28 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools" tools:context=".MainActivity">
-    <item android:id="@+id/action_settings" android:title="@string/action_settings"
-        android:orderInCategory="100" app:showAsAction="never" />
+    xmlns:tools="http://schemas.android.com/tools">
+    <item
+        android:id="@+id/newgame"
+        android:orderInCategory="100"
+        android:title="@string/newGameButton"/>
+
+    <item
+        android:id="@+id/settings"
+        android:orderInCategory="100"
+        android:title="@string/settingButtonString"/>
+
+    <item
+        android:id="@+id/help"
+        android:orderInCategory="130"
+        android:title="@string/helpButton"/>
+
+    <item
+        android:id="@+id/about"
+        android:orderInCategory="130"
+        android:title="@string/aboutButton"/>
+
+    <item
+        android:id="@+id/exit"
+        android:orderInCategory="130"
+        android:title="@string/exitButton"/>
 </menu>

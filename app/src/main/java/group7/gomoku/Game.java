@@ -166,4 +166,116 @@ public class Game {
         return true;
     }
 
+    // caller should ensure that nextPosition is guaranteed to be within the board
+    public Position getNextPosition (Position p, int direction) {
+        Position nextPosition = new Position();
+
+        switch (direction) {
+            case 0:
+                // direction 0: moveRight
+                nextPosition = mPosition[(p.x)++][p.y];
+                break;
+            case 1:
+                // direction 1: moveDownRight
+                nextPosition = mPosition[(p.x)++][(p.y)--];
+                break;
+            case 2:
+                // direction 2: moveDown
+                nextPosition = mPosition[p.x][(p.y)--];
+                break;
+            case 3:
+                // direction 3: moveDownLeft
+                nextPosition = mPosition[(p.x)--][(p.y)--];
+                break;
+            case 4:
+                // direction 4: moveLeft
+                nextPosition = mPosition[(p.x)--][p.y];
+                break;
+            case 5:
+                // direction 5: moveUpLeft
+                nextPosition = mPosition[(p.x)--][(p.y)++];
+                break;
+            case 6:
+                // direction 6: moveUp
+                nextPosition = mPosition[p.x][(p.y)++];
+                break;
+            case 7:
+                // direction 7: moveUpRight
+                nextPosition = mPosition[(p.x)++][(p.y)++];
+                break;
+            default:
+                break;
+        }
+        return nextPosition;
+    }
+
+    // flag: 1 White
+    // flag: 2 Black
+    public void checkForWinner (Position p, int flag) {
+        int i, j;
+        int[] tmp = new int[10];
+        Position curPosition = new Position();
+        curPosition = p;
+
+        // Horizontal wins:
+        tmp[5] = p.occupy;
+        // fill the right half of tmp buffer |x|x|x|x|x|*|6|7|8|9|10|
+        for (i = 6; i <= 10; i++) {
+            curPosition = getNextPosition(curPosition, 0);
+            tmp[i] = curPosition.occupy;
+        }
+        // fill the left half of tmp buffer |0|1|2|3|4|x|x|x|x|x|x|
+        curPosition = p;
+        for (i = 4; i >= 0; i--) {
+            curPosition = getNextPosition(curPosition, 4);
+            tmp[i] = curPosition.occupy;
+        }
+
+        if (isWinner(tmp) == 0)
+            System.out.print("No horizontal win!");
+        else if (isWinner(tmp) == 1)
+            System.out.print("White won!");
+            // endgame here!!!
+        else if (isWinner(tmp) == 2)
+            System.out.print("White won!");
+            //endgame here!!!!
+
+        // Vertical wins:
+        // similar to above...
+
+        // Diagonal Down Wins
+
+        // Diagonal Up Wins
+
+
+    }
+
+    // return 1 if white win
+    // return 2 if black win
+    // return 0 if no winner
+    public int isWinner (int []arr) {
+        int i;
+        int same = 1;
+        int winner = 0;
+        // look for 5 consecutive color in tmp buffer
+        for (i = 0; i < 10; i++) {
+            if (arr[i] == arr[i + 1])
+                same++;
+            if (same == 5)
+                break;
+            else
+                same = 1;
+        }
+        // potential win, need to check for the 6th stone
+        if (same == 5) {
+            if (arr[i] == arr[i + 1])
+                return 0;
+            else
+                return arr[i]; // should be 1 or 2!
+
+        }
+        return 0;
+    }
+
+
 }

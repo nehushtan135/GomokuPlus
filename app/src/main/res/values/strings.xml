@@ -7,6 +7,7 @@
     <string name="settingButtonString">Settings</string>
     <string name="newGameButton">New Game</string>
     <string name="helpButton">How to Play</string>
+    <string name="exitButton">Exit</string>
     <string name="aboutButton">About</string>
     <string name="title_activity_about">About</string>
     <string name="title_activity_help">Help</string>
@@ -21,7 +22,9 @@
     <string name="who">CS 454/554 Intro to Software Engineering. \n\n\nDeveloped By:\n\n
         Purva Chhatre\n Dany Madden\n Elijah Varga\n Lai Xu </string>
     <string name="settingString">Settings</string>
-    <string name="textRule2">6532</string>
     <string name="passString">Pass</string>
+    <string name="pausedString">Paused</string>
+    <string name="title_activity_blank">blank</string>
+    <string name="hello_world">Hello world!</string>
 
 </resources>

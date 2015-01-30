@@ -1,6 +1,7 @@
 package group7.gomoku;
 
 import android.app.Activity;
+import android.app.Dialog;
 import android.content.Intent;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
@@ -24,6 +25,7 @@ public class MainActivity extends Activity {
         setupOnSettingClick();
         setupOnHelpClick();
         setupOnAboutClick();
+        setupOnExitClick();
         playMusic();
     }
 
@@ -74,7 +76,17 @@ public class MainActivity extends Activity {
 
         });
     }
+    public void setupOnExitClick() {
+        Button exButton = (Button) findViewById(R.id.exitButton);
+        exButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                finish();
+                System.exit(0);
+            }
+        });
 
+    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -88,14 +100,29 @@ public class MainActivity extends Activity {
         // Handle action bar item clicks here. The action bar will
         // automatically handle clicks on the Home/Up button, so long
         // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
+        switch (item.getItemId())
+        {
+            case R.id.newgame:
+                startActivity(new Intent(MainActivity.this, NewGame.class));
+                return true;
+            case R.id.exit:
+                finish();
+                System.exit(0);
+                return true;
+            case R.id.help:
+                startActivity(new Intent(MainActivity.this, Help.class));
+                return true;
+            case R.id.about:
+                startActivity(new Intent(MainActivity.this, About.class));
+                return true;
+            case R.id.settings:
+                startActivity(new Intent(MainActivity.this, Settings.class));
+                return true;
 
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
+            default:
+                return super.onOptionsItemSelected(item);
         }
 
-        return super.onOptionsItemSelected(item);
     }
 
     public boolean MuteAudio(View view){

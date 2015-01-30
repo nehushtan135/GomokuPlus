@@ -7,11 +7,11 @@
         android:minSdkVersion="15" >
     </uses-sdk>
 
-    <uses-permission
+    <android:uses-permission
         android:name="android.permission.WRITE_EXTERNAL_STORAGE"
         android:maxSdkVersion="18" />
-    <uses-permission android:name="android.permission.READ_PHONE_STATE" />
-    <uses-permission
+    <android:uses-permission android:name="android.permission.READ_PHONE_STATE" />
+    <android:uses-permission
         android:name="android.permission.READ_EXTERNAL_STORAGE"
         android:maxSdkVersion="18" />
 
@@ -61,8 +61,12 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="group7.gomoku.MainActivity" />
         </activity>
-        <service android:name="com.example.vi.gomokuplus.ServiceAudioPlay"  android:enabled="true">
+
+        <service
+            android:name="com.example.vi.gomokuplus.ServiceAudioPlay"
+            android:enabled="true" >
         </service>
+
     </application>
 
 </manifest>
