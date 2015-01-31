@@ -251,7 +251,7 @@ public class Game {
     }
 
     // return 1 if white win!!
-    // return 2 if black win!
+    // return 2 if black win!!
     // return 0 if no winner!
     public int isWinner (int []arr) {
         int i;
