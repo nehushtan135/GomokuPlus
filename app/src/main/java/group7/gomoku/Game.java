@@ -232,12 +232,12 @@ public class Game {
         }
 
         if (isWinner(tmp) == 0)
-            System.out.print("No horizontal win!");
+            System.out.print ("No horizontal win!");
         else if (isWinner(tmp) == 1)
-            System.out.print("White won!");
+            System.out.print ("White won!");
             // endgame here!!!
         else if (isWinner(tmp) == 2)
-            System.out.print("White won!");
+            System.out.print ("White won!");
             //endgame here!!!!
 
         // Vertical wins:
@@ -250,9 +250,9 @@ public class Game {
 
     }
 
-    // return 1 if white win
-    // return 2 if black win
-    // return 0 if no winner
+    // return 1 if white win!!
+    // return 2 if black win!
+    // return 0 if no winner!
     public int isWinner (int []arr) {
         int i;
         int same = 1;
