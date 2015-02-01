@@ -131,7 +131,15 @@ public class Game {
             }
         });
     }
-
+    public void changeTurn() {
+        if(curParty == 1){
+            curParty = 2;
+        }else if(curParty == 2){
+            curParty = 1;
+        }else{
+            //error here
+        }
+    }
     public boolean PutStoneByTouch(int flag, int x, int y){
         //find right position based on the minimum distance
         Position position = mPosition[0][0];
@@ -155,13 +163,7 @@ public class Game {
 
         PutStone(flag, position);
 
-        if(curParty == 1){
-            curParty = 2;
-        }else if(curParty == 2){
-            curParty = 1;
-        }else{
-            //error here
-        }
+        changeTurn();
 
         return true;
     }

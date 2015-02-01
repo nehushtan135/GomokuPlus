@@ -44,7 +44,7 @@ public class NewGame extends MainActivity {
             @Override
             public void onClick(View v) {
                 timer.start();
-
+                mGame.changeTurn();
             }
         });
 
