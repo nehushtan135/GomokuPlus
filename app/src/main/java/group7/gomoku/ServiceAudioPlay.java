@@ -1,4 +1,4 @@
-package com.example.vi.gomokuplus;
+package group7.gomoku;
 
 import android.media.MediaPlayer;
 import android.app.Service;

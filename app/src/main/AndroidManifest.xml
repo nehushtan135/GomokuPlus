@@ -63,7 +63,7 @@
         </activity>
 
         <service
-            android:name="com.example.vi.gomokuplus.ServiceAudioPlay"
+            android:name="group7.gomoku.ServiceAudioPlay"
             android:enabled="true" >
         </service>
 

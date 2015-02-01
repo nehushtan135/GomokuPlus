@@ -40,8 +40,8 @@
         style="@style/btnStyleGenoa"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="@string/settingButtonString"
-        android:id="@+id/settingsButton"
+        android:text="@string/PlayAiButton"
+        android:id="@+id/PlayAiButton"
         android:layout_centerHorizontal="true"
         android:layout_centerVertical="true"
         android:layout_below="@id/newGameButton"
@@ -51,7 +51,7 @@
         android:layout_marginLeft="@dimen/ButtonBuffer"
         android:layout_marginRight="@dimen/ButtonBuffer"
         android:layout_marginBottom="@dimen/ButtonBuffer"
-        android:onClick="onSettingClick"
+        android:onClick="onPlayAiClick"
         />
 
 
@@ -61,34 +61,20 @@
         android:layout_height="wrap_content"
         android:layout_centerHorizontal="true"
         android:layout_centerVertical="true"
-        android:layout_below="@id/settingsButton"
+        android:layout_below="@id/PlayAiButton"
 
         android:paddingLeft="@dimen/ButtonBuffer"
         android:paddingRight="@dimen/ButtonBuffer"
         android:theme="@style/btnStyleGenoa"
         android:layout_marginLeft="@dimen/ButtonBuffer"
         android:layout_marginRight="@dimen/ButtonBuffer"
-        android:text="@string/helpButton"
-        android:onClick="onHelpClick"
-        android:id="@+id/helpButton"
+        android:text="@string/MultiplayerButton"
+        android:onClick="onMultiplayerClick"
+        android:id="@+id/MultiplayerButton"
         android:layout_marginBottom="@dimen/ButtonBuffer" />
 
 
-    <Button
-        style="@style/btnStyleGenoa"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="@string/aboutButton"
-        android:id="@+id/aboutButton"
-        android:layout_centerHorizontal="true"
-        android:layout_centerVertical="true"
-        android:layout_below="@id/helpButton"
-        android:paddingLeft="@dimen/ButtonBuffer"
-        android:paddingRight="@dimen/ButtonBuffer"
-        android:theme="@style/btnStyleGenoa"
-        android:layout_marginLeft="@dimen/ButtonBuffer"
-        android:onClick="onAboutClick"
-        android:layout_marginRight="@dimen/ButtonBuffer" />
+
 
     <Button
         style="@style/btnStyleGenoa"
@@ -102,7 +88,7 @@
         android:paddingRight="@dimen/ButtonBuffer"
         android:theme="@style/btnStyleGenoa"
         android:onClick="onExitClick"
-        android:layout_below="@+id/aboutButton"
+        android:layout_below="@+id/MultiplayerButton"
         android:layout_marginLeft="@dimen/ButtonBuffer"
         android:layout_marginRight="@dimen/ButtonBuffer"
         android:layout_marginBottom="@dimen/ButtonBuffer"

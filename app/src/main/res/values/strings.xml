@@ -6,7 +6,8 @@
     <string name="action_settings">Settings</string>
     <string name="settingButtonString">Settings</string>
     <string name="newGameButton">New Game</string>
-    <string name="helpButton">How to Play</string>
+    <string name="PlayAiButton">AI Mode</string>
+    <string name="MultiplayerButton">MultiPlayer</string>
     <string name="exitButton">Exit</string>
     <string name="aboutButton">About</string>
     <string name="title_activity_about">About</string>
@@ -15,6 +16,8 @@
     <string name="ruleString2">Be the first to create EXACTLY 5 adjacent stones of the same color VERTICALLY, HORIZONTALLY or DIAGONALLY. \n\nThe line must not be blocked at both ends.</string>
     <string name="title_activity_new_game">NewGame</string>
     <string name="NewGameText">New Game Page</string>
+    <string name="HowToPlay">How To Play</string>
+    <string name="Help">Help</string>
     <string name="Player1">Player1</string>
     <string name="Player2">Player2</string>
     <string name="title_activity_settings">Settings</string>
@@ -26,5 +29,8 @@
     <string name="pausedString">Paused</string>
     <string name="title_activity_blank">blank</string>
     <string name="hello_world">Hello world!</string>
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="pauseString">Game Paused</string>
+    <string name="resumeG">Resume</string>
 
 </resources>
