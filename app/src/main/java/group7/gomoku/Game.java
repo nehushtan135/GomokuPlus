@@ -1,6 +1,7 @@
 package group7.gomoku;
 
 import android.app.Activity;
+import android.app.Dialog;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -214,7 +215,7 @@ public class Game {
     // flag: 1 White
     // flag: 2 Black
     public void checkForWinner (Position p, int flag) {
-        int i, j;
+        int i;
         int[] tmp = new int[10];
         Position curPosition = new Position();
         curPosition = p;
@@ -232,24 +233,54 @@ public class Game {
             curPosition = getNextPosition(curPosition, 4);
             tmp[i] = curPosition.occupy;
         }
-
-        if (isWinner(tmp) == 0)
-            System.out.print ("No horizontal win!");
-        else if (isWinner(tmp) == 1)
-            System.out.print ("White won!");
-            // endgame here!!!
-        else if (isWinner(tmp) == 2)
-            System.out.print ("White won!");
-            //endgame here!!!!
+        if (isWinner(tmp) != 0) {
+            //We have a winner... EndGame here
+        }
 
         // Vertical wins:
-        // similar to above...
+        curPosition = p;
+        for (i = 6; i <= 10; i++){
+            curPosition = getNextPosition(curPosition, 6);
+            tmp[i] = curPosition.occupy;
+        }
+        curPosition = p;
+        for (i = 4; i >= 0; i--){
+            curPosition = getNextPosition(curPosition, 2);
+            tmp[i] = curPosition.occupy;
+        }
+        if (isWinner(tmp) != 0) {
+            //We have a winner... EndGame here
+        }
 
         // Diagonal Down Wins
+        curPosition = p;
+        for (i = 6; i <= 10; i++){
+            curPosition = getNextPosition(curPosition, 5);
+            tmp[i] = curPosition.occupy;
+        }
+        curPosition = p;
+        for (i = 4; i >= 0; i--){
+            curPosition = getNextPosition(curPosition, 7);
+            tmp[i] = curPosition.occupy;
+        }
+        if (isWinner(tmp) != 0) {
+            //We have a winner... EndGame here
+        }
 
         // Diagonal Up Wins
-
-
+        curPosition = p;
+        for (i = 6; i <= 10; i++){
+            curPosition = getNextPosition(curPosition, 3);
+            tmp[i] = curPosition.occupy;
+        }
+        curPosition = p;
+        for (i = 4; i >= 0; i--){
+            curPosition = getNextPosition(curPosition, 1);
+            tmp[i] = curPosition.occupy;
+        }
+        if (isWinner(tmp) != 0) {
+            //We have a winner... EndGame here
+        }
     }
 
     // return 1 if white win!!
@@ -259,6 +290,7 @@ public class Game {
         int i;
         int same = 1;
         int winner = 0;
+
         // look for 5 consecutive color in tmp buffer
         for (i = 0; i < 10; i++) {
             if (arr[i] == arr[i + 1])
@@ -272,12 +304,28 @@ public class Game {
         if (same == 5) {
             if (arr[i] == arr[i + 1])
                 return 0;
-            else
+            else {
+                // Report who won
+                /*Dialog dialog = new Dialog(this);
+                //dialog.setTitle(getString(R.string.app_name));
+                dialog.setContentView(this);
+                dialog.setCancelable(true);
+                dialog.show();*/
                 return arr[i]; // should be 1 or 2!
-
+            }
         }
         return 0;
     }
 
+    public void endGame(){
+        // need a way to end game. Exit or reset the board
+    }
 
+    public void resetGame(){
+        // reset for a new game
+    }
+
+    public void pauseGame(){
+
+    }
 }
