@@ -22,9 +22,9 @@ public class MainActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         setupOnNewGameClick();
-        setupOnSettingClick();
-        setupOnHelpClick();
-        setupOnAboutClick();
+
+        setupOnPlayAiClick();
+        setupOnMultiplayerClick();
         setupOnExitClick();
         playMusic();
     }
@@ -34,16 +34,18 @@ public class MainActivity extends Activity {
         stopMusic();
         super.onDestroy();
     }
-
-    private void setupOnSettingClick() {
-        Button seButton = (Button) findViewById(R.id.settingsButton);
+    private void setupOnPlayAiClick() {
+        Button seButton = (Button) findViewById(R.id.PlayAiButton);
         seButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                startActivity(new Intent(MainActivity.this, Settings.class));
+                //PUT AI CODE HERE
+                //startActivity(new Intent(MainActivity.this, Settings.class));
             }
         });
     }
+
+
 
 
     public void setupOnNewGameClick() {
@@ -56,26 +58,17 @@ public class MainActivity extends Activity {
 
         });
     }
-    public void setupOnHelpClick() {
-        Button heButton = (Button) findViewById(R.id.helpButton);
+    public void setupOnMultiplayerClick() {
+        Button heButton = (Button) findViewById(R.id.MultiplayerButton);
         heButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                startActivity(new Intent(MainActivity.this, Help.class));
+                //  startActivity(new Intent(MainActivity.this, Help.class));
             }
 
         });
     }
-    public void setupOnAboutClick() {
-        Button abButton = (Button) findViewById(R.id.aboutButton);
-        abButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                startActivity(new Intent(MainActivity.this, About.class));
-            }
 
-        });
-    }
     public void setupOnExitClick() {
         Button exButton = (Button) findViewById(R.id.exitButton);
         exButton.setOnClickListener(new View.OnClickListener() {
@@ -149,13 +142,13 @@ public class MainActivity extends Activity {
 
     //start audio play service and play music
     public void playMusic(){
-        Intent intentPlayMusic = new Intent(this, com.example.vi.gomokuplus.ServiceAudioPlay.class);
+        Intent intentPlayMusic = new Intent(this, group7.gomoku.ServiceAudioPlay.class);
         startService(intentPlayMusic);
     }
 
     // stop playing music via stop audio play service
     public void stopMusic(){
-        Intent intentPlayMusic = new Intent(this, com.example.vi.gomokuplus.ServiceAudioPlay.class);
+        Intent intentPlayMusic = new Intent(this, group7.gomoku.ServiceAudioPlay.class);
         stopService(intentPlayMusic);
     }
 }

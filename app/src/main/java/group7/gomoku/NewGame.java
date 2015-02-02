@@ -1,6 +1,7 @@
 package group7.gomoku;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
@@ -12,6 +13,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
@@ -23,16 +25,18 @@ import java.util.concurrent.TimeUnit;
 public class NewGame extends MainActivity {
 
     Button btnPass;
+    ImageButton btnPause;
     TextView textViewTime;
     ImageView imageBoard;
+    String cTime;
     Game mGame;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_new_game);
-
         btnPass = (Button) findViewById(R.id.btnPass);
+        btnPause = (ImageButton) findViewById(R.id.btn_pause);
         textViewTime = (TextView) findViewById(R.id.textViewTime);
 
         textViewTime.setText("03:00");
@@ -40,11 +44,20 @@ public class NewGame extends MainActivity {
 
         timer.start();
         //btnPass.setBackgroundColor(BLUE);
+        btnPause.setOnClickListener(new View.OnClickListener() {
+           @Override
+           public void onClick(View v) {
+               timer.cancel();
+
+
+           }
+
+            } );
         btnPass.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 timer.start();
-
+                mGame.changeTurn();
             }
         });
 
@@ -86,6 +99,9 @@ public class NewGame extends MainActivity {
             long millis = millisUntilFinished;
             String ms = String.format("%02d:%02d", TimeUnit.MILLISECONDS.toMinutes(millis) - TimeUnit.HOURS.toMinutes(TimeUnit.MILLISECONDS.toHours(millis)),
                     TimeUnit.MILLISECONDS.toSeconds(millis) - TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes(millis)));
+            //cTime is storing the current time left on the clock into a variable that pauseButton onclicklistener can then store to recover on resume.
+            cTime = ms;
+
 
             //System.out.println(ms);
             textViewTime.setText(ms);
