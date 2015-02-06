@@ -3,6 +3,7 @@ package group7.gomoku;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
+import android.app.DialogFragment;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -22,7 +23,8 @@ import android.view.View.OnClickListener;
 import java.util.concurrent.TimeUnit;
 
 
-public class NewGame extends MainActivity {
+public class NewGame extends MainActivity
+        implements PauseFragment.OnFragmentInteractionListener {
 
     Button btnPass;
     ImageButton btnPause;
@@ -48,6 +50,8 @@ public class NewGame extends MainActivity {
            @Override
            public void onClick(View v) {
                timer.cancel();
+               DialogFragment pauseFrag = PauseFragment.newInstance();
+               pauseFrag.show(getFragmentManager(), "dialog");
 
 
            }
@@ -64,6 +68,7 @@ public class NewGame extends MainActivity {
         mGame = new Game(this);
 
     }
+
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {

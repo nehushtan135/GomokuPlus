@@ -31,6 +31,10 @@ public class PauseFragment extends DialogFragment {
             // Create the AlertDialog object and return it
             return builder.create();
     }
+    static PauseFragment newInstance() {
+            PauseFragment pF = new PauseFragment();
+        return pF;
+    }
 
     private OnFragmentInteractionListener mListener;
 
@@ -86,8 +90,6 @@ public class PauseFragment extends DialogFragment {
      * >Communicating with Other Fragments</a> for more information.
      */
     public interface OnFragmentInteractionListener {
-        // TODO: Update argument type and name
-        public void onFragmentInteraction(Uri uri);
     }
 
 }
