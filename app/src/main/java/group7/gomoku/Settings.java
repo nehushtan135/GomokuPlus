@@ -67,13 +67,13 @@ public class Settings extends MainActivity {
 
     //start audio play service and play music
     public void playMusic(){
-        Intent intentPlayMusic = new Intent(this, com.example.vi.gomokuplus.ServiceAudioPlay.class);
+        Intent intentPlayMusic = new Intent(this, group7.gomoku.ServiceAudioPlay.class);
         startService(intentPlayMusic);
     }
 
     // stop playing music via stop audio play service
     public void stopMusic(){
-        Intent intentPlayMusic = new Intent(this, com.example.vi.gomokuplus.ServiceAudioPlay.class);
+        Intent intentPlayMusic = new Intent(this, group7.gomoku.ServiceAudioPlay.class);
         stopService(intentPlayMusic);
     }
 }
