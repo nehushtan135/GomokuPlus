@@ -10,11 +10,11 @@
         android:layout_height="70dp"
         style="@style/GenoaTextStyle"
         android:id="@+id/textView2"
+        android:singleLine="true"
+        android:layout_alignParentTop="true"
         android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="false"
-        android:layout_alignRight="@+id/btn_mute"
-        android:layout_alignEnd="@+id/btn_mute"
-        android:singleLine="true" />
+        android:layout_alignParentStart="true"
+        android:layout_alignBottom="@+id/btn_pause" />
 
 
     <TextView
@@ -40,7 +40,8 @@
         android:layout_alignTop="@+id/textViewTime"
         android:layout_alignBottom="@+id/btnPass"
         android:onClick="PauseGame"
-        android:nestedScrollingEnabled="false" />
+        android:nestedScrollingEnabled="false"
+        android:scaleType="fitStart" />
 
 
     <Button
@@ -55,26 +56,35 @@
         android:layout_marginRight="10dp"
         android:layout_marginTop="10dp" />
 
-    <ImageView
+    <SurfaceView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:id="@+id/imageBoard"
-        android:src="@drawable/board10"
-        android:scaleType="fitCenter"
+        android:id="@+id/surfaceView"
         android:layout_alignParentBottom="true"
-        android:layout_alignRight="@+id/btnPass"
-        android:layout_alignEnd="@+id/btnPass"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
         android:layout_below="@+id/textView2" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="New Text"
+        android:id="@+id/test"
+        android:layout_above="@+id/surfaceView"
+        android:layout_alignTop="@+id/btn_pause"
+        android:layout_toLeftOf="@+id/textViewTime"
+        android:layout_toStartOf="@+id/textViewTime" />
 
     <RelativeLayout
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
-        android:layout_alignParentBottom="true"
-        android:layout_toEndOf="@+id/btn_pause"
-        android:layout_alignTop="@+id/imageBoard"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true"
-        android:id="@+id/boardLayout"></RelativeLayout>
+        android:layout_toStartOf="@+id/btnPass"
+        android:id="@+id/boardLayout"
+        android:layout_below="@+id/btn_pause"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true"></RelativeLayout>
 
 
 </RelativeLayout>

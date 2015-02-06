@@ -1,7 +1,6 @@
 package group7.gomoku;
 
 import android.app.Activity;
-import android.app.Dialog;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -9,8 +8,6 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
-
-import java.io.PipedOutputStream;
 
 /**
  * 10*10 Gomoku Game
@@ -91,7 +88,7 @@ public class Game {
         }
         */
         mLayout = (RelativeLayout)(((Activity)mContext).findViewById(R.id.boardLayout));
-        mBoard = (ImageView) (((Activity)mContext).findViewById(R.id.imageBoard));
+        //mBoard = (ImageView) (((Activity)mContext).findViewById(R.id.imageBoard));
         addListenerOnBoard();
 
     }
@@ -133,15 +130,7 @@ public class Game {
             }
         });
     }
-    public void changeTurn() {
-        if(curParty == 1){
-            curParty = 2;
-        }else if(curParty == 2){
-            curParty = 1;
-        }else{
-            //error here
-        }
-    }
+
     public boolean PutStoneByTouch(int flag, int x, int y){
         //find right position based on the minimum distance
         Position position = mPosition[0][0];
@@ -165,7 +154,7 @@ public class Game {
 
         PutStone(flag, position);
 
-        changeTurn();
+        //changeTurn();
 
         return true;
     }
