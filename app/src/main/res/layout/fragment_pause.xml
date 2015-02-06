@@ -9,7 +9,6 @@
         android:id="@+id/pauseBtn_mute"
         android:src="@drawable/unmute"
         android:background="@null"
-        android:onClick="MuteAudio"
         android:layout_gravity="top|center_vertical"
         android:contentDescription="option to mute music" />
 
@@ -20,9 +19,7 @@
         android:text="@string/pauseResume"
         android:id="@+id/pauseResume"
         android:layout_gravity="right|center_vertical"
-        android:theme="@style/btnStyleGenoa"
-        android:onClick="onPauseResume" />
-
+        android:theme="@style/btnStyleGenoa"/>
     <Button
         style="@style/btnStyleGenoa"
         android:layout_width="wrap_content"
@@ -31,6 +28,5 @@
         android:id="@+id/pauseExit"
         android:layout_gravity="left|center_vertical"
         android:theme="@style/btnStyleGenoa"
-        android:onClick="onPauseExit"
     />
 </FrameLayout>

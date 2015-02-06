@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.DialogFragment;
+import android.app.FragmentManager;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -23,8 +24,7 @@ import android.view.View.OnClickListener;
 import java.util.concurrent.TimeUnit;
 
 
-public class NewGame extends MainActivity
-        implements PauseFragment.OnFragmentInteractionListener {
+public class NewGame extends MainActivity {
 
     Button btnPass;
     ImageButton btnPause;
@@ -50,9 +50,9 @@ public class NewGame extends MainActivity
            @Override
            public void onClick(View v) {
                timer.cancel();
-               DialogFragment pauseFrag = PauseFragment.newInstance();
-               pauseFrag.show(getFragmentManager(), "dialog");
-
+               FragmentManager fM = getFragmentManager();
+               PauseFragment pF = new PauseFragment();
+               pF.show(fM,"Pause");
 
            }
 
@@ -69,6 +69,12 @@ public class NewGame extends MainActivity
 
     }
 
+
+    public void showDialog(View v) {
+        FragmentManager fM = getFragmentManager();
+        PauseFragment pF = new PauseFragment();
+        pF.show(fM,"Pause");
+    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
