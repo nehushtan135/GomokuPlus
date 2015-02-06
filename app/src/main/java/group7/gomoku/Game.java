@@ -14,7 +14,8 @@ import java.io.PipedOutputStream;
 
 /**
  * 10*10 Gomoku Game
- * Created by Lai Xu on 2015/1/26.
+ * Created by Lai Xu on Jan.01.2015
+ * Modified by Lai Xu on Feb.05.2015
  */
 public class Game {
 
