@@ -13,30 +13,35 @@ import android.os.CountDownTimer;
 import android.support.v7.app.ActionBarActivity;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.SurfaceHolder;
+import android.view.SurfaceView;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageButton;
-import android.widget.ImageView;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.view.View.OnClickListener;
 
 import java.util.concurrent.TimeUnit;
 
 
-public class NewGame extends MainActivity {
+public class NewGame extends MainActivity implements SurfaceHolder.Callback{
 
     Button btnPass;
     ImageButton btnPause;
     TextView textViewTime;
-    ImageView imageBoard;
+    //ImageView imageBoard;
     String cTime;
-    Game mGame;
+    GamePlus mGame;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
         setContentView(R.layout.activity_new_game);
+        SurfaceView sv = (SurfaceView)findViewById(R.id.surfaceView);
+        mGame = new GamePlus(this, sv, 10);
+        sv.getHolder().addCallback(this);
+
         btnPass = (Button) findViewById(R.id.btnPass);
         btnPause = (ImageButton) findViewById(R.id.btn_pause);
         textViewTime = (TextView) findViewById(R.id.textViewTime);
@@ -54,6 +59,7 @@ public class NewGame extends MainActivity {
                PauseFragment pF = new PauseFragment();
                pF.show(fM,"Pause");
 
+
            }
 
             } );
@@ -65,15 +71,6 @@ public class NewGame extends MainActivity {
             }
         });
 
-        mGame = new Game(this);
-
-    }
-
-
-    public void showDialog(View v) {
-        FragmentManager fM = getFragmentManager();
-        PauseFragment pF = new PauseFragment();
-        pF.show(fM,"Pause");
     }
 
     @Override
@@ -125,6 +122,17 @@ public class NewGame extends MainActivity {
         }
     }
 
+    @Override
+    public void surfaceCreated(SurfaceHolder holder) {
+        mGame.draw();
+    }
 
+    @Override
+    public void surfaceChanged(SurfaceHolder holder, int frmt, int w, int h) {
+        mGame.draw();
+    }
+
+    @Override
+    public void surfaceDestroyed(SurfaceHolder holder) {}
 
 }

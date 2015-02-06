@@ -1,9 +1,7 @@
 package group7.gomoku;
 
 import android.app.Activity;
-import android.app.Dialog;
 import android.content.Intent;
-import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -26,12 +24,12 @@ public class MainActivity extends Activity {
         setupOnPlayAiClick();
         setupOnMultiplayerClick();
         setupOnExitClick();
-        playMusic();
+        //playMusic();
     }
 
     @Override
     protected void onDestroy() {
-        stopMusic();
+        //stopMusic();
         super.onDestroy();
     }
     private void setupOnPlayAiClick() {
@@ -150,5 +148,12 @@ public class MainActivity extends Activity {
     public void stopMusic(){
         Intent intentPlayMusic = new Intent(this, group7.gomoku.ServiceAudioPlay.class);
         stopService(intentPlayMusic);
+    }
+
+    //Release UI memory
+
+    @Override
+    public void onTrimMemory(int level) {
+        super.onTrimMemory(level);
     }
 }

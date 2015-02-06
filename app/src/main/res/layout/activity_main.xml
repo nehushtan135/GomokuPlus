@@ -5,19 +5,6 @@
     style="@style/customTheme">
 
     <!-- to be done later I want to add the icon to the top center of the screen and reduce the size a little-->
-    <ImageView
-        android:layout_width="fill_parent"
-        android:layout_height="fill_parent"
-        android:contentDescription="main_screen"
-        android:src="@drawable/gomoku_main"
-        android:id="@+id/main_image"
-        android:adjustViewBounds="false"
-        android:cropToPadding="false"
-        android:focusable="false"
-        android:padding="@dimen/abc_action_bar_subtitle_bottom_margin_material"
-        android:layout_above="@+id/newGameButton"
-        android:layout_centerHorizontal="true"
-        android:scaleType="centerCrop" />
 
 
     <Button
