@@ -197,24 +197,36 @@ public class GamePlus implements Runnable {
         float minDistance = posMatrix[0][0].getSquareDistance(x, y);
         float curDistance = 0;
 
-        int i, j;
+        int i, j, row = 0, col = 0;
         for (i = 0; i < boardType + 1; i++) {
             for (j = 0; j < boardType + 1; j++) {
                 curDistance = posMatrix[i][j].getSquareDistance(x, y);
                 if (minDistance > curDistance) {
                     position = posMatrix[i][j];
+                    row = i;
+                    col = j;
                     minDistance = curDistance;
                 }
             }
         }
 
-        if (position.occupy != 0) {
+        //if (position.occupy != 0) {
+        if (posMatrix[col][row].occupy != 0) {
             return false;
         }
 
-
         PutStone(flag, position);
+        posMatrix[col][row].occupy = flag;
 
+        System.out.print ("posMatrix: ");
+        for (i = 0; i <= boardType; i++) {
+            for (j = 0; j <= boardType; j++){
+                System.out.printf ("%d ", posMatrix[i][j].occupy);
+            }
+            System.out.printf ("\n");
+        }
+
+        checkForWinner(col, row);
         changeTurn();
 
 
@@ -244,7 +256,7 @@ public class GamePlus implements Runnable {
         position.imageStone.setLayoutParams(lp);
         mLayout.addView(position.imageStone);
 
-        position.occupy = flag;
+        //position.occupy = flag;
     }
 
     public void changeTurn() {
@@ -260,6 +272,281 @@ public class GamePlus implements Runnable {
     public void run() {
 
         //Setup
+    }
+
+    public Position getNextPosition (int col, int row, int direction) {
+        Position nextPosition = new Position();
+        switch (direction) {
+            case 0:
+                // direction 0: moveRight
+                nextPosition = posMatrix[col++][row];
+                break;
+		    case 1:
+			    // direction 1: moveDownRight
+			    nextPosition = posMatrix[col++][row--];
+			    break;
+		    case 2:
+			    // direction 2: moveDown
+			    nextPosition = posMatrix[col][row--];
+			    break;
+		    case 3:
+			    // direction 3: moveDownLeft
+			    nextPosition = posMatrix[col--][row--];
+			    break;
+            case 4:
+                // direction 4: moveLeft
+                nextPosition = posMatrix[col--][row];
+                break;
+		    case 5:
+			    // direction 5: moveUpLeft
+			    nextPosition = posMatrix[col--][row++];
+			    break;
+		    case 6:
+			    // direction 6: moveUp
+			    nextPosition = posMatrix[col][row++];
+			    break;
+		    case 7:
+			    // direction 7: moveUpRight
+			    nextPosition = posMatrix[col++][row++];
+			    break;
+            default:
+                break;
+        }
+        return nextPosition;
+    }
+
+    // flag: 1 White
+    // flag: 2 Black
+    public void checkForWinner (int col, int row) {
+        int i, winner;
+        int  nextc = col;
+        int  nextr = row;
+        int[] tmp = new int[11];
+        Position curPosition = new Position();
+        curPosition = posMatrix[col][row];
+
+        // System.out.printf (" ==> %d, %d \n", col, row);
+
+        // Vertical wins:
+        tmp[5] = curPosition.occupy;
+        // fill the right half of tmp buffer |x|x|x|x|x|*|6|7|8|9|10|
+        for (i = 6; i <= 10; i++) {
+            nextc++;
+            if (nextc <= boardType) {
+                curPosition = getNextPosition(nextc, row, 0);
+                tmp[i] = curPosition.occupy;
+            }
+            else
+                tmp[i] = -1;
+        }
+        // fill the left half of tmp buffer |0|1|2|3|4|x|x|x|x|x|x|
+        //curPosition = posMatrix[col][row];
+        nextc = col;
+        for (i = 4; i >= 0; i--) {
+            nextc--;
+            if (nextc >=  0) {
+                curPosition = getNextPosition(nextc, row, 4);
+                tmp[i] = curPosition.occupy;
+            }
+            else // Since we  have to get 4 positions, we have to put -1
+                // when it's outside the board.
+                tmp[i] = -1;
+        }
+
+        System.out.print ("Before isWinner: ");
+        for (i = 0; i <= 10; i ++)
+            System.out.printf ("%d ", tmp[i]);
+
+        winner = isWinner(tmp);
+        if (winner == 1) {
+            System.out.print("White Won Vertically!!!\n");
+            return; // TODO: reset the board after a win.
+        }
+        else if (winner == 2) {
+            System.out.print("Black Won Horizontally!!!\n");
+            return; // same as above: reset the board after a win.
+        }
+
+
+		// Horizontal wins:
+        nextr = row;
+		for (i = 6; i <= 10; i++){
+            nextr ++;
+            if (nextr <= boardType) {
+                curPosition = getNextPosition(col, nextr, 6);
+                tmp[i] = curPosition.occupy;
+            }
+            else
+                tmp[i] = -1;
+		}
+		//curPosition = posMatrix[col][row];
+        nextr = row;
+		for (i = 4; i >= 0; i--){
+            nextr--;
+            if (nextr >= 0) {
+                curPosition = getNextPosition(col, nextr, 2);
+                tmp[i] = curPosition.occupy;
+            }
+            else
+                tmp[i] = -1;
+		}
+
+        winner = isWinner(tmp);
+        if (winner == 1) {
+            System.out.print("White Won Horizontally!!!\n");
+            return; // TODO: reset the board here!
+        }
+        else if (winner == 2) {
+            System.out.print("Black Won Horizontally!!!\n");
+            return;
+        }
+
+
+		// Diagonal Down Wins
+		nextc = col;
+        nextr = row;
+		for (i = 6; i <= 10; i++){
+            nextr++;
+            nextc++;
+            if ((nextc <= boardType) && (nextr <= boardType)) {
+                curPosition = getNextPosition(nextc, nextr, 5);
+                tmp[i] = curPosition.occupy;
+            }
+            else
+                tmp[i]= -1;
+		}
+		//curPosition = posMatrix[col][row];
+        nextr = row;
+        nextc = col;
+		for (i = 4; i >= 0; i--){
+            nextr--;
+            nextc--;
+            if ((nextr >= 0) && (nextc >= 0)) {
+                curPosition = getNextPosition(nextc, nextr, 7);
+                tmp[i] = curPosition.occupy;
+            }
+            else
+                tmp[i] = -1;
+		}
+
+        winner = isWinner(tmp);
+        if (winner == 1) {
+            System.out.print("White Won Diagonally Down!!!\n");
+            return; // TODO: reset the board here!
+        }
+        else if (winner == 2) {
+            System.out.print("Black Won Diagonally Down!!!\n");
+            return;
+        }
+
+
+		// Diagonal Up Wins
+        nextc = col;
+        nextr = row;
+		for (i = 6; i <= 10; i++){
+            nextc++;
+            nextr--;
+            if ((nextc <= boardType) && (nextr >= 0)) {
+                curPosition = getNextPosition(nextc, nextr, 3);
+                tmp[i] = curPosition.occupy;
+            }
+            else
+                tmp[i] = -1;
+		}
+
+		//curPosition = posMatrix[col][row];
+        nextc = col;
+        nextr = row;
+		for (i = 4; i >= 0; i--){
+            nextr++;
+            nextc--;
+            if ((nextr <= boardType) && (nextc >= 0)) {
+                curPosition = getNextPosition(nextc, nextr, 1);
+                tmp[i] = curPosition.occupy;
+            }
+            else
+                tmp[i] = -1;
+		}
+
+        winner = isWinner(tmp);
+        if (winner == 1) {
+            System.out.print("White Won Diagonally Up!!!\n");
+            return; // TODO: reset the board here!
+        }
+        else if (winner == 2) {
+            System.out.print("Black Won Diagonally Up!!!\n");
+            return;
+        }
+        else
+            System.out.print("No winner!\n");
 
     }
+
+    // return 1 if white win!!
+    // return 2 if black win!!
+    // return 0 if no winner!
+    public int isWinner (int []arr) {
+        int i;
+        int same = 1;
+        //boolean lookBack = false;
+        System.out.print ("isWinner arr: ");
+        for (int j = 0; j <= 10; j++)
+            System.out.printf ("%d ", arr[j]);
+        System.out.print ("\n");
+        // look for 5 consecutive color in tmp buffer
+        for (i = 0; i < 10; i++) {
+            if (arr[i] == arr[i + 1]) {
+                // count the same only for 1 or 2, not 0 or -1.
+                if ((arr [i] == 1 ) || (arr[i] == 2))
+                    same++;
+                //if ((arr [i] == 0 ) || (arr[i] == -1))
+                //    lookBack = false;
+            }
+            else {
+                same = 1;
+            }
+            if (same == 5)
+                break;
+        }
+        i++;
+        //System.out.printf ("isWinner i = %d\n", i);
+        // potential win when 5 stones are the same. Do some more checking.
+        if (same == 5) {
+            if (i < 10) { // don't go out of arr bound.
+                // If right is empty or up to the right end of the board, win.
+                if ((arr[i+1] == 0) || (arr[i+1] == -1)) {
+                    //System.out.printf ("1.Winner: %d\n", arr[i]);
+                    return arr[i];
+                }
+                // if right is blocked by the same num, no win.
+                else if (arr[i+1] == arr[i]) {
+                    //System.out.print ("2.No Winner\n");
+                    return 0;
+                }
+
+                // If you're Here: the right is blocked.
+                // so we need to look back left [i-5].
+                // We can only win if [i -5] is  0 or -1.
+
+                // if left is blocked by 1 or 2, no win!
+                else if ((arr[i - 5] == 1) || (arr[i - 5] == 2)) {
+                    //System.out.print ("3.No Winner\n");
+                    return 0;
+                }
+                // up to the left end of the board or empty
+                if ((arr[i-5] == -1) || (arr[i-5] == 0)) {
+                    //System.out.printf ("2.Winner: %d\n", arr[i]);
+                    return arr[i];
+                }
+
+            }
+            else if (i == 10) {
+                //System.out.printf ("3.Winner: %d\n", arr[i]);
+                return arr[i];
+            }
+        }
+        //System.out.print ("4.No Winner!\n");
+        return 0;
+    }
+
 }
