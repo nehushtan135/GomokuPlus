@@ -6,6 +6,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Paint;
+import android.view.Gravity;
 import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
@@ -13,11 +14,14 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.widget.Toast;
+
+import org.w3c.dom.Text;
 
 /**
  * Created by Lai Xu on 15-2-6.
  */
-public class GamePlus implements Runnable {
+public class GamePlus implements Runnable  {
     Context context;
     SurfaceView sv;
     int curParty;
@@ -41,6 +45,10 @@ public class GamePlus implements Runnable {
         addListenerOnBoard();
 
 
+    }
+
+    public void newGame() {
+        draw();
     }
 
     public class Position {
@@ -325,8 +333,6 @@ public class GamePlus implements Runnable {
         Position curPosition = new Position();
         curPosition = posMatrix[col][row];
 
-        // System.out.printf (" ==> %d, %d \n", col, row);
-
         // Vertical wins:
         tmp[5] = curPosition.occupy;
         // fill the right half of tmp buffer |x|x|x|x|x|*|6|7|8|9|10|
@@ -340,7 +346,6 @@ public class GamePlus implements Runnable {
                 tmp[i] = -1;
         }
         // fill the left half of tmp buffer |0|1|2|3|4|x|x|x|x|x|x|
-        //curPosition = posMatrix[col][row];
         nextc = col;
         for (i = 4; i >= 0; i--) {
             nextc--;
@@ -352,134 +357,90 @@ public class GamePlus implements Runnable {
                 // when it's outside the board.
                 tmp[i] = -1;
         }
-
-        System.out.print ("Before isWinner: ");
-        for (i = 0; i <= 10; i ++)
-            System.out.printf ("%d ", tmp[i]);
-
         winner = isWinner(tmp);
-        if (winner == 1) {
-            System.out.print("White Won Vertically!!!\n");
-            return; // TODO: reset the board after a win.
-        }
-        else if (winner == 2) {
-            System.out.print("Black Won Horizontally!!!\n");
-            return; // same as above: reset the board after a win.
+        if (winner != 0) {
+            displayWinner(winner, "Vertically!!!");
         }
 
-
-		// Horizontal wins:
+        // Horizontal wins:
         nextr = row;
-		for (i = 6; i <= 10; i++){
-            nextr ++;
+        for (i = 6; i <= 10; i++) {
+            nextr++;
             if (nextr <= boardType) {
                 curPosition = getNextPosition(col, nextr, 6);
                 tmp[i] = curPosition.occupy;
-            }
-            else
+            } else
                 tmp[i] = -1;
-		}
-		//curPosition = posMatrix[col][row];
+        }
         nextr = row;
-		for (i = 4; i >= 0; i--){
+        for (i = 4; i >= 0; i--) {
             nextr--;
             if (nextr >= 0) {
                 curPosition = getNextPosition(col, nextr, 2);
                 tmp[i] = curPosition.occupy;
-            }
-            else
+            } else
                 tmp[i] = -1;
-		}
-
+        }
         winner = isWinner(tmp);
-        if (winner == 1) {
-            System.out.print("White Won Horizontally!!!\n");
-            return; // TODO: reset the board here!
-        }
-        else if (winner == 2) {
-            System.out.print("Black Won Horizontally!!!\n");
-            return;
+        if (winner != 0) {
+            displayWinner(winner, "Horizontally!!!");
         }
 
-
-		// Diagonal Down Wins
-		nextc = col;
+        // Diagonal Down Wins
+        nextc = col;
         nextr = row;
-		for (i = 6; i <= 10; i++){
+        for (i = 6; i <= 10; i++) {
             nextr++;
             nextc++;
             if ((nextc <= boardType) && (nextr <= boardType)) {
                 curPosition = getNextPosition(nextc, nextr, 5);
                 tmp[i] = curPosition.occupy;
-            }
-            else
-                tmp[i]= -1;
-		}
-		//curPosition = posMatrix[col][row];
+            } else
+                tmp[i] = -1;
+        }
         nextr = row;
         nextc = col;
-		for (i = 4; i >= 0; i--){
+        for (i = 4; i >= 0; i--) {
             nextr--;
             nextc--;
             if ((nextr >= 0) && (nextc >= 0)) {
                 curPosition = getNextPosition(nextc, nextr, 7);
                 tmp[i] = curPosition.occupy;
-            }
-            else
+            } else
                 tmp[i] = -1;
-		}
-
+        }
         winner = isWinner(tmp);
-        if (winner == 1) {
-            System.out.print("White Won Diagonally Down!!!\n");
-            return; // TODO: reset the board here!
-        }
-        else if (winner == 2) {
-            System.out.print("Black Won Diagonally Down!!!\n");
-            return;
+        if (winner != 0) {
+            displayWinner(winner, "Diagonally Down!!!");
         }
 
-
-		// Diagonal Up Wins
+        // Diagonal Up Wins
         nextc = col;
         nextr = row;
-		for (i = 6; i <= 10; i++){
+        for (i = 6; i <= 10; i++) {
             nextc++;
             nextr--;
             if ((nextc <= boardType) && (nextr >= 0)) {
                 curPosition = getNextPosition(nextc, nextr, 3);
                 tmp[i] = curPosition.occupy;
-            }
-            else
+            } else
                 tmp[i] = -1;
-		}
-
-		//curPosition = posMatrix[col][row];
+        }
         nextc = col;
         nextr = row;
-		for (i = 4; i >= 0; i--){
+        for (i = 4; i >= 0; i--) {
             nextr++;
             nextc--;
             if ((nextr <= boardType) && (nextc >= 0)) {
                 curPosition = getNextPosition(nextc, nextr, 1);
                 tmp[i] = curPosition.occupy;
-            }
-            else
+            } else
                 tmp[i] = -1;
-		}
-
+        }
         winner = isWinner(tmp);
-        if (winner == 1) {
-            System.out.print("White Won Diagonally Up!!!\n");
-            return; // TODO: reset the board here!
+        if (winner != 0) {
+            displayWinner(winner, "Diagonally Up!!!");
         }
-        else if (winner == 2) {
-            System.out.print("Black Won Diagonally Up!!!\n");
-            return;
-        }
-        else
-            System.out.print("No winner!\n");
-
     }
 
     // return 1 if white win!!
@@ -505,13 +466,15 @@ public class GamePlus implements Runnable {
             else {
                 same = 1;
             }
-            if (same == 5)
+            // if this true, then i >= 4;
+            if (same == 5) {
+                i++;
                 break;
+            }
         }
-        i++;
-        //System.out.printf ("isWinner i = %d\n", i);
+
         // potential win when 5 stones are the same. Do some more checking.
-        if (same == 5) {
+        if ((same == 5) && (i <= 10) && (i >=5)) {
             if (i < 10) { // don't go out of arr bound.
                 // If right is empty or up to the right end of the board, win.
                 if ((arr[i+1] == 0) || (arr[i+1] == -1)) {
@@ -549,4 +512,22 @@ public class GamePlus implements Runnable {
         return 0;
     }
 
+    public void displayWinner (int winner, String dir) {
+        Toast toast = new Toast(context);
+        String who = "";
+        CharSequence msg;
+        if (winner == 1)
+            who = "White";
+        else if (winner == 2)
+            who = "Black";
+
+        msg = String.format("%s Won %s", who, dir);
+
+        toast.setView(mLayout);
+        toast.setGravity(Gravity.CENTER|Gravity.TOP, 0, 0);
+        toast.makeText(context, msg, Toast.LENGTH_LONG).show();
+
+        // ask to START NEW GAME  or EXIT here!!!
+
+    }
 }
