@@ -6,6 +6,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Paint;
+import android.view.Gravity;
 import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
@@ -13,11 +14,14 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.widget.Toast;
+
+import org.w3c.dom.Text;
 
 /**
  * Created by Lai Xu on 15-2-6.
  */
-public class GamePlus implements Runnable {
+public class GamePlus implements Runnable  {
     Context context;
     SurfaceView sv;
     int curParty;
@@ -41,6 +45,10 @@ public class GamePlus implements Runnable {
         addListenerOnBoard();
 
 
+    }
+
+    public void newGame() {
+        draw();
     }
 
     public class Position {
@@ -197,24 +205,36 @@ public class GamePlus implements Runnable {
         float minDistance = posMatrix[0][0].getSquareDistance(x, y);
         float curDistance = 0;
 
-        int i, j;
+        int i, j, row = 0, col = 0;
         for (i = 0; i < boardType + 1; i++) {
             for (j = 0; j < boardType + 1; j++) {
                 curDistance = posMatrix[i][j].getSquareDistance(x, y);
                 if (minDistance > curDistance) {
                     position = posMatrix[i][j];
+                    row = i;
+                    col = j;
                     minDistance = curDistance;
                 }
             }
         }
 
-        if (position.occupy != 0) {
+        //if (position.occupy != 0) {
+        if (posMatrix[col][row].occupy != 0) {
             return false;
         }
 
-
         PutStone(flag, position);
+        posMatrix[col][row].occupy = flag;
 
+        System.out.print ("posMatrix: ");
+        for (i = 0; i <= boardType; i++) {
+            for (j = 0; j <= boardType; j++){
+                System.out.printf ("%d ", posMatrix[i][j].occupy);
+            }
+            System.out.printf ("\n");
+        }
+
+        checkForWinner(col, row);
         changeTurn();
 
 
@@ -244,7 +264,7 @@ public class GamePlus implements Runnable {
         position.imageStone.setLayoutParams(lp);
         mLayout.addView(position.imageStone);
 
-        position.occupy = flag;
+        //position.occupy = flag;
     }
 
     public void changeTurn() {
@@ -260,6 +280,254 @@ public class GamePlus implements Runnable {
     public void run() {
 
         //Setup
+    }
+
+    public Position getNextPosition (int col, int row, int direction) {
+        Position nextPosition = new Position();
+        switch (direction) {
+            case 0:
+                // direction 0: moveRight
+                nextPosition = posMatrix[col++][row];
+                break;
+		    case 1:
+			    // direction 1: moveDownRight
+			    nextPosition = posMatrix[col++][row--];
+			    break;
+		    case 2:
+			    // direction 2: moveDown
+			    nextPosition = posMatrix[col][row--];
+			    break;
+		    case 3:
+			    // direction 3: moveDownLeft
+			    nextPosition = posMatrix[col--][row--];
+			    break;
+            case 4:
+                // direction 4: moveLeft
+                nextPosition = posMatrix[col--][row];
+                break;
+		    case 5:
+			    // direction 5: moveUpLeft
+			    nextPosition = posMatrix[col--][row++];
+			    break;
+		    case 6:
+			    // direction 6: moveUp
+			    nextPosition = posMatrix[col][row++];
+			    break;
+		    case 7:
+			    // direction 7: moveUpRight
+			    nextPosition = posMatrix[col++][row++];
+			    break;
+            default:
+                break;
+        }
+        return nextPosition;
+    }
+
+    // flag: 1 White
+    // flag: 2 Black
+    public void checkForWinner (int col, int row) {
+        int i, winner;
+        int  nextc = col;
+        int  nextr = row;
+        int[] tmp = new int[11];
+        Position curPosition = new Position();
+        curPosition = posMatrix[col][row];
+
+        // Vertical wins:
+        tmp[5] = curPosition.occupy;
+        // fill the right half of tmp buffer |x|x|x|x|x|*|6|7|8|9|10|
+        for (i = 6; i <= 10; i++) {
+            nextc++;
+            if (nextc <= boardType) {
+                curPosition = getNextPosition(nextc, row, 0);
+                tmp[i] = curPosition.occupy;
+            }
+            else
+                tmp[i] = -1;
+        }
+        // fill the left half of tmp buffer |0|1|2|3|4|x|x|x|x|x|x|
+        nextc = col;
+        for (i = 4; i >= 0; i--) {
+            nextc--;
+            if (nextc >=  0) {
+                curPosition = getNextPosition(nextc, row, 4);
+                tmp[i] = curPosition.occupy;
+            }
+            else // Since we  have to get 4 positions, we have to put -1
+                // when it's outside the board.
+                tmp[i] = -1;
+        }
+        winner = isWinner(tmp);
+        if (winner != 0) {
+            displayWinner(winner, "Vertically!!!");
+        }
+
+        // Horizontal wins:
+        nextr = row;
+        for (i = 6; i <= 10; i++) {
+            nextr++;
+            if (nextr <= boardType) {
+                curPosition = getNextPosition(col, nextr, 6);
+                tmp[i] = curPosition.occupy;
+            } else
+                tmp[i] = -1;
+        }
+        nextr = row;
+        for (i = 4; i >= 0; i--) {
+            nextr--;
+            if (nextr >= 0) {
+                curPosition = getNextPosition(col, nextr, 2);
+                tmp[i] = curPosition.occupy;
+            } else
+                tmp[i] = -1;
+        }
+        winner = isWinner(tmp);
+        if (winner != 0) {
+            displayWinner(winner, "Horizontally!!!");
+        }
+
+        // Diagonal Down Wins
+        nextc = col;
+        nextr = row;
+        for (i = 6; i <= 10; i++) {
+            nextr++;
+            nextc++;
+            if ((nextc <= boardType) && (nextr <= boardType)) {
+                curPosition = getNextPosition(nextc, nextr, 5);
+                tmp[i] = curPosition.occupy;
+            } else
+                tmp[i] = -1;
+        }
+        nextr = row;
+        nextc = col;
+        for (i = 4; i >= 0; i--) {
+            nextr--;
+            nextc--;
+            if ((nextr >= 0) && (nextc >= 0)) {
+                curPosition = getNextPosition(nextc, nextr, 7);
+                tmp[i] = curPosition.occupy;
+            } else
+                tmp[i] = -1;
+        }
+        winner = isWinner(tmp);
+        if (winner != 0) {
+            displayWinner(winner, "Diagonally Down!!!");
+        }
+
+        // Diagonal Up Wins
+        nextc = col;
+        nextr = row;
+        for (i = 6; i <= 10; i++) {
+            nextc++;
+            nextr--;
+            if ((nextc <= boardType) && (nextr >= 0)) {
+                curPosition = getNextPosition(nextc, nextr, 3);
+                tmp[i] = curPosition.occupy;
+            } else
+                tmp[i] = -1;
+        }
+        nextc = col;
+        nextr = row;
+        for (i = 4; i >= 0; i--) {
+            nextr++;
+            nextc--;
+            if ((nextr <= boardType) && (nextc >= 0)) {
+                curPosition = getNextPosition(nextc, nextr, 1);
+                tmp[i] = curPosition.occupy;
+            } else
+                tmp[i] = -1;
+        }
+        winner = isWinner(tmp);
+        if (winner != 0) {
+            displayWinner(winner, "Diagonally Up!!!");
+        }
+    }
+
+    // return 1 if white win!!
+    // return 2 if black win!!
+    // return 0 if no winner!
+    public int isWinner (int []arr) {
+        int i;
+        int same = 1;
+        //boolean lookBack = false;
+        System.out.print ("isWinner arr: ");
+        for (int j = 0; j <= 10; j++)
+            System.out.printf ("%d ", arr[j]);
+        System.out.print ("\n");
+        // look for 5 consecutive color in tmp buffer
+        for (i = 0; i < 10; i++) {
+            if (arr[i] == arr[i + 1]) {
+                // count the same only for 1 or 2, not 0 or -1.
+                if ((arr [i] == 1 ) || (arr[i] == 2))
+                    same++;
+                //if ((arr [i] == 0 ) || (arr[i] == -1))
+                //    lookBack = false;
+            }
+            else {
+                same = 1;
+            }
+            // if this true, then i >= 4;
+            if (same == 5) {
+                i++;
+                break;
+            }
+        }
+
+        // potential win when 5 stones are the same. Do some more checking.
+        if ((same == 5) && (i <= 10) && (i >=5)) {
+            if (i < 10) { // don't go out of arr bound.
+                // If right is empty or up to the right end of the board, win.
+                if ((arr[i+1] == 0) || (arr[i+1] == -1)) {
+                    //System.out.printf ("1.Winner: %d\n", arr[i]);
+                    return arr[i];
+                }
+                // if right is blocked by the same num, no win.
+                else if (arr[i+1] == arr[i]) {
+                    //System.out.print ("2.No Winner\n");
+                    return 0;
+                }
+
+                // If you're Here: the right is blocked.
+                // so we need to look back left [i-5].
+                // We can only win if [i -5] is  0 or -1.
+
+                // if left is blocked by 1 or 2, no win!
+                else if ((arr[i - 5] == 1) || (arr[i - 5] == 2)) {
+                    //System.out.print ("3.No Winner\n");
+                    return 0;
+                }
+                // up to the left end of the board or empty
+                if ((arr[i-5] == -1) || (arr[i-5] == 0)) {
+                    //System.out.printf ("2.Winner: %d\n", arr[i]);
+                    return arr[i];
+                }
+
+            }
+            else if (i == 10) {
+                //System.out.printf ("3.Winner: %d\n", arr[i]);
+                return arr[i];
+            }
+        }
+        //System.out.print ("4.No Winner!\n");
+        return 0;
+    }
+
+    public void displayWinner (int winner, String dir) {
+        Toast toast = new Toast(context);
+        String who = "";
+        CharSequence msg;
+        if (winner == 1)
+            who = "White";
+        else if (winner == 2)
+            who = "Black";
+
+        msg = String.format("%s Won %s", who, dir);
+
+        toast.setView(mLayout);
+        toast.setGravity(Gravity.CENTER|Gravity.TOP, 0, 0);
+        toast.makeText(context, msg, Toast.LENGTH_LONG).show();
+
+        // ask to START NEW GAME  or EXIT here!!!
 
     }
 }
