@@ -21,7 +21,7 @@
     <string name="Player1">Player1</string>
     <string name="Player2">Player2</string>
     <string name="title_activity_settings">Settings</string>
-    <string name="aboutString">About the Developers</string>
+    <string name="aboutString">Developers</string>
     <string name="who">CS 454/554 Intro to Software Engineering. \n\n\nDeveloped By:\n\n
         Purva Chhatre\n Dany Madden\n Elijah Varga\n Lai Xu </string>
     <string name="settingString">Settings</string>
