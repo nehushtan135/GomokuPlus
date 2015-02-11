@@ -20,17 +20,19 @@ import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.TextView;
 import android.view.View.OnClickListener;
+import android.widget.Toast;
 
 import java.util.concurrent.TimeUnit;
 
 
-public class NewGame extends MainActivity implements SurfaceHolder.Callback{
+public class NewGame extends MainActivity implements SurfaceHolder.Callback, PauseFragment.PauseCom{
 
     Button btnPass;
     ImageButton btnPause;
     TextView textViewTime;
     //ImageView imageBoard;
     String cTime;
+    long pauseMillis;
     GamePlus mGame;
 
     @Override
@@ -39,7 +41,7 @@ public class NewGame extends MainActivity implements SurfaceHolder.Callback{
 
         setContentView(R.layout.activity_new_game);
         SurfaceView sv = (SurfaceView)findViewById(R.id.surfaceView);
-        mGame = new GamePlus(this, sv, 10);
+        mGame = new GamePlus(this, sv, 10,0,0);
         sv.getHolder().addCallback(this);
 
         btnPass = (Button) findViewById(R.id.btnPass);
@@ -57,7 +59,7 @@ public class NewGame extends MainActivity implements SurfaceHolder.Callback{
                timer.cancel();
                FragmentManager fM = getFragmentManager();
                PauseFragment pF = new PauseFragment();
-               pF.show(fM,"Pause");
+               pF.show(fM,"PauseFragment");
 
 
            }
@@ -94,6 +96,13 @@ public class NewGame extends MainActivity implements SurfaceHolder.Callback{
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public void onDialogResume() {
+        textViewTime.setText(cTime);
+
+
     }
 
 

@@ -13,7 +13,6 @@ import android.widget.ImageButton;
 public class MainActivity extends Activity {
 
     boolean muteAudio = false;
-    // declare and init various needed id's
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

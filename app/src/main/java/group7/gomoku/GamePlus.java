@@ -1,11 +1,14 @@
 package group7.gomoku;
 
 import android.app.Activity;
+import android.app.DialogFragment;
+import android.app.FragmentManager;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Paint;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.MotionEvent;
 import android.view.SurfaceHolder;
@@ -21,10 +24,11 @@ import org.w3c.dom.Text;
 /**
  * Created by Lai Xu on 15-2-6.
  */
-public class GamePlus implements Runnable  {
+public class GamePlus extends MainActivity implements Runnable, WinnerFrag.WinCom {
     Context context;
     SurfaceView sv;
     int curParty;
+    int wScore,bScore;
     Position[][] posMatrix;
     Bitmap mStoneWhiteScale;
     Bitmap mStoneBlackScale;
@@ -34,10 +38,12 @@ public class GamePlus implements Runnable  {
     RelativeLayout mLayout;
 
 
-    GamePlus(Context context, SurfaceView sv, int boardType) {
+    GamePlus(Context context, SurfaceView sv, int boardType,int wScore, int bScore) {
         this.context = context;
         this.sv = sv;
         this.boardType = boardType;
+        this.wScore = wScore;
+        this.bScore = bScore;
         mStoneBlackScale = null;
         mStoneWhiteScale = null;
         curParty = 1;
@@ -50,6 +56,9 @@ public class GamePlus implements Runnable  {
     public void newGame() {
         draw();
     }
+
+
+
 
     public class Position {
         float x;
@@ -198,7 +207,7 @@ public class GamePlus implements Runnable  {
 
     public boolean PutStoneByTouch(int flag, float x, float y) {
         TextView textView = (TextView)((Activity) context).findViewById(R.id.test);
-        textView.setText("x="+x+" y="+y+"\n");
+        textView.setText("White: "+wScore+" Black="+bScore+"\n");
 
         //find right position based on the minimum distance
         Position position = posMatrix[0][0];
@@ -516,18 +525,41 @@ public class GamePlus implements Runnable  {
         Toast toast = new Toast(context);
         String who = "";
         CharSequence msg;
-        if (winner == 1)
+        if (winner == 1) {
+            wScore +=1;
             who = "White";
-        else if (winner == 2)
+        }
+        else if (winner == 2) {
+            bScore +=1;
             who = "Black";
-
+        }
         msg = String.format("%s Won %s", who, dir);
+       /* if(wScore >= 1 || bScore >=1) {
+            showDialog(who,wScore,bScore);
+        }
+*/
 
         toast.setView(mLayout);
         toast.setGravity(Gravity.CENTER|Gravity.TOP, 0, 0);
         toast.makeText(context, msg, Toast.LENGTH_LONG).show();
 
-        // ask to START NEW GAME  or EXIT here!!!
+
+
+        // TODO update score, !!!
 
     }
+    void showDialog(String winner, int white, int black) {
+        DialogFragment newFrag = WinnerFrag.newInstance(winner,white,black);
+        newFrag.show(getFragmentManager(), "dialog");
+    }
+    @Override
+    public void doOnPositiveClick() {
+        //reset
+    }
+    @Override
+    public void doOnNegativeClick() {
+
+    }
+
+
 }

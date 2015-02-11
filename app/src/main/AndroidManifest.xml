@@ -2,7 +2,6 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="group7.gomoku" >
 
-
     <uses-sdk
         android:maxSdkVersion="21"
         android:minSdkVersion="15" >
@@ -18,9 +17,9 @@
 
     <application
         android:allowBackup="true"
-        android:largeHeap="true"
         android:icon="@drawable/gomoku_icon"
         android:label="@string/app_name"
+        android:largeHeap="true"
         android:theme="@style/customTheme" >
         <activity
             android:name=".MainActivity"
@@ -65,10 +64,14 @@
         </activity>
 
         <service
-            android:name="group7.gomoku.ServiceAudioPlay"
+            android:name=".ServiceAudioPlay"
             android:enabled="true" >
         </service>
 
+        <activity
+            android:name=".WinnerFrag"
+            android:label="@string/title_activity_winner_frag" >
+        </activity>
     </application>
 
 </manifest>

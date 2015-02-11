@@ -34,5 +34,10 @@
     <string name="resumeG">Resume</string>
     <string name="pauseExit">   Exit Game   </string>
     <string name="pauseResume">   Resume Game   </string>
+    <string name="title_activity_winner_frag">WinnerFrag</string>
+    <string name="whiteScore">White: \t</string>
+    <string name="blackScore">Black: \t</string>
+    <string name="winReset">Play Again</string>
+    <string name="winExit">Quit</string>
 
 </resources>
