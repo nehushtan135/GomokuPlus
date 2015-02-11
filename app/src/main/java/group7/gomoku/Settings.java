@@ -2,6 +2,7 @@ package group7.gomoku;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.preference.PreferenceActivity;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.view.Menu;
@@ -10,21 +11,24 @@ import android.view.View;
 import android.widget.ImageButton;
 
 
-public class Settings extends MainActivity {
+public class Settings extends PreferenceActivity {
 
     boolean muteAudio = false;
+    @SuppressWarnings("deprecation")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_settings);
+        // to go back to old settings page, uncomment the next line.
+        // setContentView(R.layout.activity_settings);
+        addPreferencesFromResource(R.xml.preferences);
     }
 
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
-        // getMenuInflater().inflate(R.menu.menu_settings, menu);
-        super.onCreateOptionsMenu(menu);
+        getMenuInflater().inflate(R.menu.menu_main, menu);
+        //super.onCreateOptionsMenu(menu);
         return true;
     }
 

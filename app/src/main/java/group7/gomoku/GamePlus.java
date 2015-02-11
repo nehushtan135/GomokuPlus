@@ -15,12 +15,13 @@ import android.view.SurfaceView;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 
 /**
  * Created by Lai Xu on 15-2-6.
  */
-public class GamePlus extends MainActivity implements Runnable, WinnerFrag.WinCom {
+public class GamePlus extends MainActivity implements Runnable {
     Context context;
     SurfaceView sv;
     int curParty;

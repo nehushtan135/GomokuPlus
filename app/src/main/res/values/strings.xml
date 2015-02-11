@@ -40,4 +40,9 @@
     <string name="winReset">Play Again</string>
     <string name="winExit">Quit</string>
 
+    <string name="pref_boardsize_default">15</string>
+    <string name="pref_boardsize">Board Dimensions</string>
+    <string name="pref_boardsize_key">pref_boardsize</string>
+    <string name="pref_music">Mute Music</string>
+
 </resources>

@@ -5,11 +5,13 @@ import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.DialogFragment;
 import android.app.FragmentManager;
+import android.content.SharedPreferences;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.os.CountDownTimer;
+import android.preference.PreferenceManager;
 import android.support.v7.app.ActionBarActivity;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -27,6 +29,7 @@ import java.util.concurrent.TimeUnit;
 
 public class NewGame extends MainActivity implements SurfaceHolder.Callback, PauseFragment.PauseCom{
 
+    private SharedPreferences sharedPrefs;
     Button btnPass;
     ImageButton btnPause;
     TextView textViewTime;
@@ -40,7 +43,12 @@ public class NewGame extends MainActivity implements SurfaceHolder.Callback, Pau
 
         setContentView(R.layout.activity_new_game);
         SurfaceView sv = (SurfaceView)findViewById(R.id.surfaceView);
-        mGame = new GamePlus(this, sv, 10,0,0);
+
+        PreferenceManager.setDefaultValues(this, R.xml.preferences, false);
+        sharedPrefs = PreferenceManager.getDefaultSharedPreferences(this);
+        String size = sharedPrefs.getString("pref_boardsize", "15");
+
+        mGame = new GamePlus(this, sv, Integer.parseInt(size), 0, 0);
         sv.getHolder().addCallback(this);
 
         btnPass = (Button) findViewById(R.id.btnPass);
