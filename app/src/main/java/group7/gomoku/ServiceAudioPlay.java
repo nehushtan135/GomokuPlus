@@ -1,11 +1,9 @@
 package group7.gomoku;
 
-import android.media.MediaPlayer;
 import android.app.Service;
 import android.content.Intent;
+import android.media.MediaPlayer;
 import android.os.IBinder;
-
-import group7.gomoku.R;
 
 
 /*
@@ -18,7 +16,7 @@ public class ServiceAudioPlay extends Service {
 
 	public void onCreate(){
 	    super.onCreate();
-	    audioPlayer = MediaPlayer.create(this, R.raw.blobbitfinal);
+	    audioPlayer = MediaPlayer.create(this, R.raw.pathtolakeland);
         audioPlayer.setLooping(true);
 
 	}

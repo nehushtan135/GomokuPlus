@@ -24,12 +24,12 @@ public class MainActivity extends Activity {
         setupOnPlayAiClick();
         setupOnMultiplayerClick();
         setupOnExitClick();
-        //playMusic();
+        playMusic();
     }
 
     @Override
     protected void onDestroy() {
-        //stopMusic();
+        stopMusic();
         super.onDestroy();
     }
     private void setupOnPlayAiClick() {
@@ -42,8 +42,6 @@ public class MainActivity extends Activity {
             }
         });
     }
-
-
 
 
     public void setupOnNewGameClick() {

@@ -46,7 +46,6 @@ public class NewGame extends MainActivity implements SurfaceHolder.Callback{
            public void onClick(View v) {
                timer.cancel();
 
-
            }
 
             } );

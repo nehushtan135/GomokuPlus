@@ -13,10 +13,7 @@ import android.view.SurfaceView;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
-import android.widget.TextView;
 import android.widget.Toast;
-
-import org.w3c.dom.Text;
 
 /**
  * Created by Lai Xu on 15-2-6.
@@ -30,6 +27,7 @@ public class GamePlus implements Runnable  {
     Bitmap mStoneBlackScale;
     float gridSize;
     int boardType;
+    boolean exitGame;
     //the the layout for the stones
     RelativeLayout mLayout;
 
@@ -41,10 +39,9 @@ public class GamePlus implements Runnable  {
         mStoneBlackScale = null;
         mStoneWhiteScale = null;
         curParty = 1;
+        exitGame = false;
         mLayout = (RelativeLayout) (((Activity) context).findViewById(R.id.boardLayout));
         addListenerOnBoard();
-
-
     }
 
     public void newGame() {
@@ -127,13 +124,13 @@ public class GamePlus implements Runnable  {
         int i = 0;
         int j = 0;
         float posOffset = 0;
-        while (i < boardType + 1) {
+        while (i < boardType+1) {
             posOffset = gridSize * i;
             canvas.drawLine(innerPosLeft + posOffset, innerPosTop, innerPosLeft + posOffset, innerPosBottom, p);
             canvas.drawLine(innerPosLeft, innerPosTop + posOffset, innerPosRight, innerPosTop + posOffset, p);
 
 
-            while (j < boardType + 1) {
+            while (j < boardType+1) {
 
                 if (posMatrix[i][j] == null) {
                     posMatrix[i][j] = new Position();
@@ -197,8 +194,6 @@ public class GamePlus implements Runnable  {
     }
 
     public boolean PutStoneByTouch(int flag, float x, float y) {
-        TextView textView = (TextView)((Activity) context).findViewById(R.id.test);
-        textView.setText("x="+x+" y="+y+"\n");
 
         //find right position based on the minimum distance
         Position position = posMatrix[0][0];
@@ -220,12 +215,14 @@ public class GamePlus implements Runnable  {
 
         //if (position.occupy != 0) {
         if (posMatrix[col][row].occupy != 0) {
+            System.out.print("Failed to put stone\n");
             return false;
         }
 
         PutStone(flag, position);
         posMatrix[col][row].occupy = flag;
 
+        /*
         System.out.print ("posMatrix: ");
         for (i = 0; i <= boardType; i++) {
             for (j = 0; j <= boardType; j++){
@@ -233,6 +230,7 @@ public class GamePlus implements Runnable  {
             }
             System.out.printf ("\n");
         }
+        */
 
         checkForWinner(col, row);
         changeTurn();
@@ -278,8 +276,25 @@ public class GamePlus implements Runnable  {
 
     @Override
     public void run() {
+    }
 
-        //Setup
+    public void resetGame(){
+
+        //remove the view from the relative layout and reset the PosMatrix
+        int i, j;
+        for (i = 0; i < boardType; i++) {
+            for (j = 0; j <= boardType; j++){
+                if(posMatrix != null){
+                    if(posMatrix[i][j].imageStone != null) {
+                        ((RelativeLayout) posMatrix[i][j].imageStone.getParent()).removeView(posMatrix[i][j].imageStone);
+                        posMatrix[i][j].imageStone = null;
+                    }
+
+                    posMatrix[i][j].occupy = 0;
+                }
+
+            }
+        }
     }
 
     public Position getNextPosition (int col, int row, int direction) {
@@ -450,10 +465,12 @@ public class GamePlus implements Runnable  {
         int i;
         int same = 1;
         //boolean lookBack = false;
+        /*
         System.out.print ("isWinner arr: ");
         for (int j = 0; j <= 10; j++)
             System.out.printf ("%d ", arr[j]);
         System.out.print ("\n");
+        */
         // look for 5 consecutive color in tmp buffer
         for (i = 0; i < 10; i++) {
             if (arr[i] == arr[i + 1]) {
@@ -526,6 +543,8 @@ public class GamePlus implements Runnable  {
         toast.setView(mLayout);
         toast.setGravity(Gravity.CENTER|Gravity.TOP, 0, 0);
         toast.makeText(context, msg, Toast.LENGTH_LONG).show();
+
+        resetGame();
 
         // ask to START NEW GAME  or EXIT here!!!
 

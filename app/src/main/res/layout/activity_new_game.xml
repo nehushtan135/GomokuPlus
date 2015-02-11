@@ -14,7 +14,7 @@
         android:layout_alignParentTop="true"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
-        android:layout_alignBottom="@+id/btn_pause" />
+        android:layout_above="@+id/boardLayout" />
 
 
     <TextView
@@ -24,9 +24,11 @@
         android:textColor="#ffffff"
         android:layout_alignParentTop="true"
         android:layout_toStartOf="@+id/btnPass"
-        android:textSize="35sp"
-        android:layout_marginRight="10dp"
-        android:layout_marginTop="10dp" />
+        android:textSize="20dp"
+        android:layout_marginTop="10dp"
+        android:layout_toLeftOf="@+id/btnPass"
+        android:layout_alignParentEnd="false"
+        android:layout_alignParentStart="false" />
         <!--android:layout_marginLeft="10dp"--> />
 
 
@@ -37,11 +39,12 @@
         android:id="@+id/btn_pause"
         android:src="@drawable/pause"
         android:background="@null"
-        android:layout_alignTop="@+id/textViewTime"
         android:layout_alignBottom="@+id/btnPass"
         android:onClick="PauseGame"
         android:nestedScrollingEnabled="false"
-        android:scaleType="fitStart" />
+        android:scaleType="fitStart"
+        android:layout_alignTop="@+id/textViewTime"
+        style="@style/Base.TextAppearance.AppCompat" />
 
 
     <Button
@@ -50,11 +53,11 @@
         android:layout_height="wrap_content"
         android:text="@string/passString"
         style="@style/GenoaTextStyle"
-        android:layout_alignParentEnd="true"
-        android:layout_alignParentStart="false"
-        android:textSize="25sp"
-        android:layout_marginRight="10dp"
-        android:layout_marginTop="10dp" />
+        android:textSize="20dp"
+        android:textStyle="normal"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true" />
 
     <SurfaceView
         android:layout_width="wrap_content"
@@ -66,16 +69,6 @@
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
         android:layout_below="@+id/textView2" />
-
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="New Text"
-        android:id="@+id/test"
-        android:layout_above="@+id/surfaceView"
-        android:layout_alignTop="@+id/btn_pause"
-        android:layout_toLeftOf="@+id/textViewTime"
-        android:layout_toStartOf="@+id/textViewTime" />
 
     <RelativeLayout
         android:layout_width="fill_parent"
