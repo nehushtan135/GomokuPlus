@@ -2,8 +2,31 @@
     xmlns:tools="http://schemas.android.com/tools" android:layout_width="match_parent"
     android:layout_height="match_parent" tools:context="group7.gomoku.PauseFragment">
 
-    <!-- TODO: Update blank fragment layout -->
-    <TextView android:layout_width="match_parent" android:layout_height="match_parent"
-        android:text="@string/hello_blank_fragment" />
 
+    <ImageButton
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/pauseBtn_mute"
+        android:src="@drawable/unmute"
+        android:background="@null"
+        android:layout_gravity="top|center_vertical"
+        android:contentDescription="option to mute music" />
+
+    <Button
+        style="@style/btnStyleGenoa"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/pauseResume"
+        android:id="@+id/pauseResume"
+        android:layout_gravity="right|center_vertical"
+        android:theme="@style/btnStyleGenoa"/>
+    <Button
+        style="@style/btnStyleGenoa"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/pauseExit"
+        android:id="@+id/pauseExit"
+        android:layout_gravity="left|center_vertical"
+        android:theme="@style/btnStyleGenoa"
+    />
 </FrameLayout>

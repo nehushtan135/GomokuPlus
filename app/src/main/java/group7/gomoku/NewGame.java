@@ -1,5 +1,6 @@
 package group7.gomoku;
 
+import android.app.FragmentManager;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.view.Menu;
@@ -19,19 +20,13 @@ public class NewGame extends MainActivity implements SurfaceHolder.Callback{
     Button btnPass;
     ImageButton btnPause;
     TextView textViewTime;
-    //ImageView imageBoard;
     String cTime;
     GamePlus mGame;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
         setContentView(R.layout.activity_new_game);
-        SurfaceView sv = (SurfaceView)findViewById(R.id.surfaceView);
-        mGame = new GamePlus(this, sv, 10);
-        sv.getHolder().addCallback(this);
-
         btnPass = (Button) findViewById(R.id.btnPass);
         btnPause = (ImageButton) findViewById(R.id.btn_pause);
         textViewTime = (TextView) findViewById(R.id.textViewTime);
@@ -40,11 +35,19 @@ public class NewGame extends MainActivity implements SurfaceHolder.Callback{
         final CounterClass timer = new CounterClass(180000,1000);
 
         timer.start();
+
+        SurfaceView sv = (SurfaceView)findViewById(R.id.surfaceView);
+        mGame = new GamePlus(this, sv, 10);
+        sv.getHolder().addCallback(this);
+
         //btnPass.setBackgroundColor(BLUE);
         btnPause.setOnClickListener(new View.OnClickListener() {
            @Override
            public void onClick(View v) {
                timer.cancel();
+               FragmentManager fM = getFragmentManager();
+               PauseFragment pF = new PauseFragment();
+               pF.show(fM,"Pause");
 
            }
 
@@ -56,6 +59,16 @@ public class NewGame extends MainActivity implements SurfaceHolder.Callback{
                 mGame.changeTurn();
             }
         });
+
+
+
+    }
+
+
+    public void showDialog(View v) {
+        FragmentManager fM = getFragmentManager();
+        PauseFragment pF = new PauseFragment();
+        pF.show(fM,"Pause");
     }
 
     @Override
