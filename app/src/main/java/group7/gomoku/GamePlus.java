@@ -290,14 +290,13 @@ public class GamePlus extends MainActivity implements Runnable {
 
         //remove the view from the relative layout and reset the PosMatrix
         int i, j;
-        for (i = 0; i < boardType; i++) {
+        for (i = 0; i <= boardType; i++) {
             for (j = 0; j <= boardType; j++){
                 if(posMatrix != null){
                     if(posMatrix[i][j].imageStone != null) {
                         ((RelativeLayout) posMatrix[i][j].imageStone.getParent()).removeView(posMatrix[i][j].imageStone);
                         posMatrix[i][j].imageStone = null;
                     }
-
                     posMatrix[i][j].occupy = 0;
                 }
 
