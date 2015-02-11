@@ -1,37 +1,27 @@
 package group7.gomoku;
 
-import android.app.Activity;
-import android.app.AlertDialog;
-import android.app.Dialog;
-import android.app.DialogFragment;
 import android.app.FragmentManager;
-import android.content.res.Resources;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.os.CountDownTimer;
-import android.support.v7.app.ActionBarActivity;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.SurfaceHolder;
+import android.view.SurfaceView;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageButton;
-import android.widget.ImageView;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
-import android.view.View.OnClickListener;
 
 import java.util.concurrent.TimeUnit;
 
 
-public class NewGame extends MainActivity {
+public class NewGame extends MainActivity implements SurfaceHolder.Callback{
 
     Button btnPass;
     ImageButton btnPause;
     TextView textViewTime;
-    ImageView imageBoard;
     String cTime;
-    Game mGame;
+    GamePlus mGame;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -45,6 +35,11 @@ public class NewGame extends MainActivity {
         final CounterClass timer = new CounterClass(180000,1000);
 
         timer.start();
+
+        SurfaceView sv = (SurfaceView)findViewById(R.id.surfaceView);
+        mGame = new GamePlus(this, sv, 10);
+        sv.getHolder().addCallback(this);
+
         //btnPass.setBackgroundColor(BLUE);
         btnPause.setOnClickListener(new View.OnClickListener() {
            @Override
@@ -65,7 +60,7 @@ public class NewGame extends MainActivity {
             }
         });
 
-        mGame = new Game(this);
+
 
     }
 
@@ -125,6 +120,17 @@ public class NewGame extends MainActivity {
         }
     }
 
+    @Override
+    public void surfaceCreated(SurfaceHolder holder) {
+        mGame.draw();
+    }
 
+    @Override
+    public void surfaceChanged(SurfaceHolder holder, int frmt, int w, int h) {
+        mGame.draw();
+    }
+
+    @Override
+    public void surfaceDestroyed(SurfaceHolder holder) {}
 
 }
