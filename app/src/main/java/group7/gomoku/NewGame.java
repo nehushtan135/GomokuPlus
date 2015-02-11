@@ -1,37 +1,42 @@
 package group7.gomoku;
 
+import android.app.Activity;
+import android.app.AlertDialog;
+import android.app.Dialog;
+import android.app.DialogFragment;
+import android.app.FragmentManager;
+import android.content.res.Resources;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.os.CountDownTimer;
+import android.support.v7.app.ActionBarActivity;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.SurfaceHolder;
-import android.view.SurfaceView;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageButton;
+import android.widget.ImageView;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.view.View.OnClickListener;
 
 import java.util.concurrent.TimeUnit;
 
 
-public class NewGame extends MainActivity implements SurfaceHolder.Callback{
+public class NewGame extends MainActivity {
 
     Button btnPass;
     ImageButton btnPause;
     TextView textViewTime;
-    //ImageView imageBoard;
+    ImageView imageBoard;
     String cTime;
-    GamePlus mGame;
+    Game mGame;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
         setContentView(R.layout.activity_new_game);
-        SurfaceView sv = (SurfaceView)findViewById(R.id.surfaceView);
-        mGame = new GamePlus(this, sv, 10);
-        sv.getHolder().addCallback(this);
-
         btnPass = (Button) findViewById(R.id.btnPass);
         btnPause = (ImageButton) findViewById(R.id.btn_pause);
         textViewTime = (TextView) findViewById(R.id.textViewTime);
@@ -45,6 +50,9 @@ public class NewGame extends MainActivity implements SurfaceHolder.Callback{
            @Override
            public void onClick(View v) {
                timer.cancel();
+               FragmentManager fM = getFragmentManager();
+               PauseFragment pF = new PauseFragment();
+               pF.show(fM,"Pause");
 
            }
 
@@ -56,6 +64,16 @@ public class NewGame extends MainActivity implements SurfaceHolder.Callback{
                 mGame.changeTurn();
             }
         });
+
+        mGame = new Game(this);
+
+    }
+
+
+    public void showDialog(View v) {
+        FragmentManager fM = getFragmentManager();
+        PauseFragment pF = new PauseFragment();
+        pF.show(fM,"Pause");
     }
 
     @Override
@@ -107,17 +125,6 @@ public class NewGame extends MainActivity implements SurfaceHolder.Callback{
         }
     }
 
-    @Override
-    public void surfaceCreated(SurfaceHolder holder) {
-        mGame.draw();
-    }
 
-    @Override
-    public void surfaceChanged(SurfaceHolder holder, int frmt, int w, int h) {
-        mGame.draw();
-    }
-
-    @Override
-    public void surfaceDestroyed(SurfaceHolder holder) {}
 
 }
