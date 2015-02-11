@@ -32,7 +32,6 @@ public class NewGame extends MainActivity implements SurfaceHolder.Callback, Pau
     TextView textViewTime;
     //ImageView imageBoard;
     String cTime;
-    long pauseMillis;
     GamePlus mGame;
 
     @Override
@@ -72,7 +71,13 @@ public class NewGame extends MainActivity implements SurfaceHolder.Callback, Pau
                 mGame.changeTurn();
             }
         });
+    }
 
+
+    public void showDialog(View v) {
+        FragmentManager fM = getFragmentManager();
+        PauseFragment pF = new PauseFragment();
+        pF.show(fM,"Pause");
     }
 
     @Override
