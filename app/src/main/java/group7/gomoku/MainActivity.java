@@ -58,7 +58,7 @@ public class MainActivity extends Activity {
         heButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                //  startActivity(new Intent(MainActivity.this, Help.class));
+                 startActivity(new Intent(MainActivity.this, Multiplayerconnection.class));
             }
 
         });
