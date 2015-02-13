@@ -18,6 +18,8 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.util.concurrent.TimeUnit;
+
 /**
  * Created by Lai Xu on 15-2-6.
  */
@@ -31,6 +33,8 @@ public class GamePlus extends MainActivity implements Runnable {
     Bitmap mStoneBlackScale;
     float gridSize;
     int boardType;
+    int maxNumStone;
+    int stoneCounter;
     boolean exitGame;
     //the the layout for the stones
     RelativeLayout mLayout;
@@ -77,6 +81,8 @@ public class GamePlus extends MainActivity implements Runnable {
         final int width = sv.getWidth();
 
         posMatrix = new Position[boardType + 1][boardType + 1];
+        maxNumStone = (boardType+1) * (boardType+1);
+        stoneCounter = 0;
 
         //Calculating the size and position of the board
         float boundWidth = 0;
@@ -229,6 +235,7 @@ public class GamePlus extends MainActivity implements Runnable {
 
         PutStone(flag, position);
         posMatrix[col][row].occupy = flag;
+        stoneCounter++;
 
         /*
         System.out.print ("posMatrix: ");
@@ -241,9 +248,12 @@ public class GamePlus extends MainActivity implements Runnable {
         */
 
         checkForWinner(col, row);
+
+        // we have a tie if the board is completely filled.
+        if (stoneCounter == maxNumStone)
+            displayWinner(-1, "This Game.");
+
         changeTurn();
-
-
         return true;
     }
 
@@ -287,7 +297,6 @@ public class GamePlus extends MainActivity implements Runnable {
     }
 
     public void resetGame(){
-
         //remove the view from the relative layout and reset the PosMatrix
         int i, j;
         for (i = 0; i <= boardType; i++) {
@@ -548,6 +557,9 @@ public class GamePlus extends MainActivity implements Runnable {
             bScore +=1;
             who = "Black";
         }
+        else if (winner == -1) {
+            who = "No One";
+        }
         msg = String.format("%s Won %s", who, dir);
        /* if(wScore >= 1 || bScore >=1) {
             showDialog(who,wScore,bScore);
@@ -558,7 +570,7 @@ public class GamePlus extends MainActivity implements Runnable {
         toast.setGravity(Gravity.CENTER|Gravity.TOP, 0, 0);
         toast.makeText(context, msg, Toast.LENGTH_LONG).show();
 
-        resetGame();
+        //resetGame();
 
         // ask to START NEW GAME  or EXIT here!!!
 
