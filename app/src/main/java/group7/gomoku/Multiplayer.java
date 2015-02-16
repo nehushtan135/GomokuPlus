@@ -24,7 +24,6 @@ public class Multiplayer extends Activity
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
     }
-    private static BluetoothSocket mSocket;
     public Boolean isRunning = false;
     private static BluetoothSocket mSocket;
     private OutputStream mOutputStream;
