@@ -62,7 +62,10 @@ public class WinnerFrag extends DialogFragment implements View.OnClickListener {
                 .create();
 
 
+
     }
+
+
     @Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);

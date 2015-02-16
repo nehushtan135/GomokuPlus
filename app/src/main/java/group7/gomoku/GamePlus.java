@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.app.DialogFragment;
 import android.app.FragmentManager;
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
@@ -21,7 +22,7 @@ import android.widget.Toast;
 /**
  * Created by Lai Xu on 15-2-6.
  */
-public class GamePlus extends MainActivity implements Runnable {
+public class GamePlus extends MainActivity implements Runnable, WinnerFrag.WinCom {
     Context context;
     SurfaceView sv;
     int curParty;
@@ -47,11 +48,31 @@ public class GamePlus extends MainActivity implements Runnable {
         curParty = 1;
         exitGame = false;
         mLayout = (RelativeLayout) (((Activity) context).findViewById(R.id.boardLayout));
+        TextView textView = (TextView)((Activity) context).findViewById(R.id.test);
+        textView.setText("White: "+wScore+" Black: "+bScore+"\n");
         addListenerOnBoard();
     }
 
     public void newGame() {
         draw();
+    }
+    void showDialog(String winner, int white, int black){
+        DialogFragment newWinFrag = WinnerFrag.newInstance(winner,white,black);
+        newWinFrag.show(getFragmentManager(), "dialog");
+    }
+
+    public void doOnPositiveClick() {
+        wScore = 0;
+        bScore = 0;
+        resetGame();
+
+    }
+
+    public void doOnNegativeClick() {
+        Intent intent = new Intent(context, MainActivity.class);
+        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        startActivity(intent);
+
     }
 
     public class Position {
@@ -200,8 +221,7 @@ public class GamePlus extends MainActivity implements Runnable {
     }
 
     public boolean PutStoneByTouch(int flag, float x, float y) {
-        TextView textView = (TextView)((Activity) context).findViewById(R.id.test);
-        textView.setText("White: "+wScore+" Black="+bScore+"\n");
+
 
         //find right position based on the minimum distance
         Position position = posMatrix[0][0];
@@ -548,11 +568,12 @@ public class GamePlus extends MainActivity implements Runnable {
             bScore +=1;
             who = "Black";
         }
+        TextView textView = (TextView)((Activity) context).findViewById(R.id.test);
+        textView.setText("White: "+wScore+" Black: "+bScore+"\n");
         msg = String.format("%s Won %s", who, dir);
-       /* if(wScore >= 1 || bScore >=1) {
-            showDialog(who,wScore,bScore);
-        }
-*/
+        if(wScore >= 1 || bScore >=1)
+            showDialog(who, wScore, bScore);
+
 
         toast.setView(mLayout);
         toast.setGravity(Gravity.CENTER|Gravity.TOP, 0, 0);
