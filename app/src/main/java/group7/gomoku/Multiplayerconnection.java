@@ -13,7 +13,8 @@ import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.net.UnknownHostException;
     import java.io.IOException;
-    import java.util.Set;
+import java.util.List;
+import java.util.Set;
     import java.util.UUID;
     //import org.anddev.andengine.util.Debug;
    //import org.d.andengine.util.Debug;
@@ -37,17 +38,16 @@ import android.view.View;
     import android.widget.AdapterView.OnItemClickListener;
     import android.widget.ArrayAdapter;
     import android.widget.GridView;
-    import android.widget.Toast;
+import android.widget.TextView;
+import android.widget.Toast;
     import java.util.Set;
     import android.widget.ListView;
    // import static android.support.v4.app.ActivityCompat.startActivityForResult;
     import static android.widget.Toast.makeText;
 
 
-
     public class Multiplayerconnection extends Activity {
-        private BluetoothAdapter mBluetoothAdapter;
-        private Set<BluetoothDevice> pairedDevices;
+        public BluetoothAdapter mBluetoothAdapter;
         private ListView lv;
         // Intent request codes
         private static final int REQUEST_CONNECT_DEVICE_SECURE = 1;
@@ -60,26 +60,52 @@ import android.view.View;
 
         // Unique UUID for this application
         private static final UUID MY_UUID_INSECURE =
-                UUID.fromString("8ce255c0-200a-11e0-ac64-0800200c9a66");
-
-//Name for the SDP record when creating server socket
+                UUID.fromString("f12aeaf8-b5af-11e4-a71e-12e3f512a338");
 
         private static final String NAME_INSECURE = "GomokuplusBluetooth";
+        private static AcceptThread mAcceptThread;
+        private static ConnectThread mConnectThread;
 
-           private static AcceptThread mAcceptThread;
+        //  private static AcceptThread mAcceptThread;
         //   private static ConnectThread mConnectThread;
+        private ArrayAdapter<String> btArrayAdapter;
+        private ListView listDevicesFound;
+        private Set<BluetoothDevice> pairedDevices;
 
+        private final BroadcastReceiver myBluetoothReceiver = new BroadcastReceiver() {
+
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                String action = intent.getAction();
+                BluetoothDevice device = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
+
+                if (BluetoothDevice.ACTION_FOUND.equals(action)) {
+                    // Found
+                    Toast.makeText(getApplicationContext(), "BT Found", Toast.LENGTH_SHORT).show();
+                }
+                if (BluetoothDevice.ACTION_ACL_CONNECTED.equals(action)) {
+                    // Conected
+                    Toast.makeText(getApplicationContext(), "BT Connected", Toast.LENGTH_SHORT).show();
+                }
+                if (BluetoothDevice.ACTION_ACL_DISCONNECTED.equals(action)) {
+                    // Disconnected
+                    Toast.makeText(getApplicationContext(), "BT Disconnected", Toast.LENGTH_SHORT).show();
+                }
+
+            }
+        };
 
         @Override
         public void onCreate(Bundle savedInstanceState) {
             super.onCreate(savedInstanceState);
+            setContentView(R.layout.activity_multiplayerconnection);
             CharSequence msg;
             String who = "";
-            //super.onCreate(savedInstanceState);
+
+
             mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
             if (mBluetoothAdapter == null) {
                 msg = String.format("%s Won %s", who, "Device does not support bluetooth");
-
             }
 
             if (!mBluetoothAdapter.isEnabled()) {
@@ -91,33 +117,52 @@ import android.view.View;
             } else {
                 Toast.makeText(getApplicationContext(), "Already on",
                         Toast.LENGTH_LONG).show();
-            }}
+            }
+            //Start Server on both devices
+            mAcceptThread=new AcceptThread();
+            mAcceptThread.start();
 
+            //DEVICES NEED TO BE PAIRED BEFORE THIS
+            pairedDevices = mBluetoothAdapter.getBondedDevices();
+            btArrayAdapter = new ArrayAdapter<String>(this, R.layout.activity_listview);
+            listDevicesFound = (ListView) findViewById(R.id.listView1);
+            listDevicesFound.setAdapter(btArrayAdapter);
 
-            // Create a BroadcastReceiver for ACTION_FOUND
+            for (BluetoothDevice bt : pairedDevices) {
+                // ** this
+                //btArrayAdapter.add(bt.getName() + "\n" + bt.getAddress());
+                // Connections tied to BT names. Can be tied to BT address too
+                btArrayAdapter.add(bt.getName());
+            }
 
+            listDevicesFound.setOnItemClickListener(new OnItemClickListener() {
+                @Override
+                public void onItemClick(AdapterView<?> parent, View view,
+                                        int position, long id) {
+                    String str = ((TextView) view).getText().toString();
 
-        public void list(View view) {
-            pairedDevices = BA.getBondedDevices();
-
-            ArrayList list = new ArrayList();
-            for (BluetoothDevice bt : pairedDevices)
-                list.add(bt.getName());
-
-            Toast.makeText(getApplicationContext(), "Showing Paired Devices",
-                    Toast.LENGTH_SHORT).show();
-            final ArrayAdapter adapter = new ArrayAdapter
-                    (this, android.R.layout.simple_list_item_1, list);
-            lv.setAdapter(adapter);
-
+                    //DEVICES NEED TO BE PAIRED BEFORE THIS
+                    pairedDevices = mBluetoothAdapter.getBondedDevices();
+                    for (BluetoothDevice bt : pairedDevices) {
+                        if (bt.getName().contentEquals(str)) {
+                            registerReceiver(myBluetoothReceiver, new IntentFilter(BluetoothDevice.ACTION_FOUND));
+                            registerReceiver(myBluetoothReceiver, new IntentFilter(BluetoothDevice.ACTION_ACL_CONNECTED));
+                            registerReceiver(myBluetoothReceiver, new IntentFilter(BluetoothDevice.ACTION_ACL_DISCONNECTED));
+                            // Start the connection to this device. I am client
+                            mConnectThread=new ConnectThread(bt);
+                            mConnectThread.start();
+                            //Now I am client, so cancel my server listener
+                            mAcceptThread.cancel();
+                        }
+                    }
+                    Toast.makeText(getBaseContext(), "Connecting to " + str, Toast.LENGTH_LONG).show();
+                    // ** for this
+                    //Toast.makeText(getBaseContext(),str.substring(str.length() -17 ),Toast.LENGTH_LONG).show();
+                }
+            });
         }
 
-        /**********************************************************************************
-         *
-         * Inner class AcceptThread
-         * Creates a thread which listens for incoming connection and passes socket to class Multiplayer_BT when socket connection is established
-         *
-         **********************************************************************************/
+        // Server Thread
         private class AcceptThread extends Thread {
             private final BluetoothServerSocket mmServerSocket;
 
@@ -128,7 +173,8 @@ import android.view.View;
                 try {
                     // MY_UUID is the app's UUID string, also used by the client code
                     tmp = mBluetoothAdapter.listenUsingRfcommWithServiceRecord(NAME_INSECURE, MY_UUID_INSECURE);
-                } catch (IOException e) { }
+                } catch (IOException e) {
+                }
                 mmServerSocket = tmp;
             }
 
@@ -139,7 +185,7 @@ import android.view.View;
                     try {
                         socket = mmServerSocket.accept();
                         Multiplayer.setBluetoothSocket(socket);
-                        Intent i=new Intent(Multiplayerconnection.this,Multiplayer.class);
+                        Intent i = new Intent(Multiplayerconnection.this, Multiplayer.class);
                         finish();
                         startActivity(i);
                     } catch (IOException e) {
@@ -160,17 +206,73 @@ import android.view.View;
                 }
             }
 
-            /** Will cancel the listening socket, and cause the thread to finish */
+
             public void cancel() {
                 try {
                     mmServerSocket.close();
+                } catch (IOException e) {
+                }
+            }
+        }
+
+        // Client Thread
+        private class ConnectThread extends Thread {
+            private final BluetoothSocket mmSocket;
+            private final BluetoothDevice mmDevice;
+
+            public ConnectThread(BluetoothDevice device) {
+                // Use a temporary object that is later assigned to mmSocket,
+                // because mmSocket is final
+                BluetoothSocket tmp = null;
+                mmDevice = device;
+
+                // Get a BluetoothSocket to connect with the given BluetoothDevice
+                try {
+                    // MY_UUID is the app's UUID string, also used by the server code
+                    tmp = device.createRfcommSocketToServiceRecord(MY_UUID_INSECURE);
+                } catch (IOException e) { }
+                mmSocket = tmp;
+            }
+
+            public void run() {
+                // Cancel discovery because it will slow down the connection
+                mBluetoothAdapter.cancelDiscovery();
+
+                try {
+                    // Connect the device through the socket. This will block
+                    // until it succeeds or throws an exception
+
+
+                    mmSocket.connect();
+
+                    Multiplayer.setBluetoothSocket(mmSocket);
+                    Intent i=new Intent(Multiplayerconnection.this,Multiplayer.class);
+                    finish();
+                    //Debug.d("BLUETOOTH SOCKET CONNECTED");
+                    startActivity(i);
+
+
+                } catch (IOException connectException) {
+                    // Unable to connect; close the socket and get out
+                    try {
+                        mmSocket.close();
+                    } catch (IOException closeException) { }
+                    return;
+                }
+
+                // Do work to manage the connection (in a separate thread)
+                // manageConnectedSocket(mmSocket);
+            }
+
+            /** Will cancel an in-progress connection, and close the socket */
+            public void cancel() {
+                try {
+                    mmSocket.close();
                 } catch (IOException e) { }
             }
         }
 
-
     }
-
 
 
 
