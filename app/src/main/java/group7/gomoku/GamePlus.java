@@ -544,14 +544,14 @@ public class GamePlus extends MainActivity implements Runnable, WinnerFrag.WinCo
         newWinFrag.show(wfM, "WinDialog");
     }
 
-    public void doOnPositiveClick(DialogFragment dialog) {
+    public void doOnPositiveClick() {
         wScore = 0;
         bScore = 0;
         resetGame();
 
     }
 
-    public void doOnNegativeClick(DialogFragment dialog) {
+    public void doOnNegativeClick() {
         Intent intent = new Intent(context, MainActivity.class);
         intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
         startActivity(intent);
@@ -573,10 +573,13 @@ public class GamePlus extends MainActivity implements Runnable, WinnerFrag.WinCo
         TextView textView = (TextView)((Activity) context).findViewById(R.id.test);
         textView.setText("White: "+wScore+" Black: "+bScore+"\n");
         msg = String.format("%s Won %s", who, dir);
-        if(wScore >= 1 || bScore >=1) {
+        if(wScore >= 2 || bScore >=2) {
             WinnerFrag newWinFrag = WinnerFrag.newInstance(who, wScore, bScore);
             newWinFrag.show(getFragmentManager(), "WinDialog");
         }
+        FragmentManager fM = getFragmentManager();
+        PauseFragment pF = new PauseFragment();
+        pF.show(fM,"PauseFragment");
 
         toast.setView(mLayout);
         toast.setGravity(Gravity.CENTER|Gravity.TOP, 0, 0);
