@@ -22,7 +22,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
 
-        style="@style/GenoaTextStyle"
+        style="@style/GenoaTextInsStyle"
         android:textSize="@dimen/TextSize"
         android:text="@string/who"
         android:id="@+id/whoText"
