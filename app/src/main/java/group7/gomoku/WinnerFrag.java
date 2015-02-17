@@ -15,9 +15,10 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.TextView;
+import android.widget.Toast;
 
 
-public class WinnerFrag extends DialogFragment implements View.OnClickListener {
+public class WinnerFrag extends DialogFragment {
 
     public static WinnerFrag newInstance(String winner,int wScore, int bScore) {
         WinnerFrag winFrag = new WinnerFrag();
@@ -27,6 +28,9 @@ public class WinnerFrag extends DialogFragment implements View.OnClickListener {
         args.putInt("blackScore",bScore);
         winFrag.setArguments(args);
         return winFrag;
+    }
+    public WinnerFrag(){
+
     }
 
 
@@ -41,28 +45,25 @@ public class WinnerFrag extends DialogFragment implements View.OnClickListener {
         int wScore = getArguments().getInt("whiteScore");
         int bScore = getArguments().getInt("blackScore");
         fScore = String.format("White  %s     Black %s",wScore,bScore);
-        return new AlertDialog.Builder(getActivity())
-                .setTitle(title)
-                .setMessage(fScore)
-                .setPositiveButton(R.string.winReset, new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        ((WinCom)getActivity()).doOnPositiveClick();
+        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+        builder.setTitle(title);
+        builder.setMessage(fScore);
+        builder.setNegativeButton(R.string.winExit, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                winCom.doOnNegativeClick(WinnerFrag.this);
+                dismiss();
+            }
+        });
+        builder.setPositiveButton(R.string.winReset, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                winCom.doOnPositiveClick(WinnerFrag.this);
 
-                    }
+            }
+        });
 
-                })
-                .setNegativeButton(R.string.winExit, new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        ((WinCom)getActivity()).doOnNegativeClick();
-
-                    }
-                })
-                .create();
-
-
-
+        return builder.create();
     }
 
 
@@ -93,23 +94,14 @@ public class WinnerFrag extends DialogFragment implements View.OnClickListener {
 
         toNewGame = (Button) view.findViewById(R.id.winReset);
         toQuit = (Button) view.findViewById(R.id.pauseExit);
-
-        toNewGame.setOnClickListener(this);
-        toQuit.setOnClickListener(this);
-
         setCancelable(false);
         return view;
     }
 
-    @Override
-    public void onClick(View v) {
-
-
-    }
 
     interface WinCom {
-        public void doOnPositiveClick();
-        public void doOnNegativeClick();
+        public void doOnPositiveClick(DialogFragment dialog);
+        public void doOnNegativeClick(DialogFragment dialog);
     }
 
 

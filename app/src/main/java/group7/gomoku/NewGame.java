@@ -82,13 +82,6 @@ public class NewGame extends MainActivity implements SurfaceHolder.Callback, Pau
         });
     }
 
-
-    public void showDialog(View v) {
-        FragmentManager fM = getFragmentManager();
-        PauseFragment pF = new PauseFragment();
-        pF.show(fM,"Pause");
-    }
-
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.

@@ -56,24 +56,7 @@ public class GamePlus extends MainActivity implements Runnable, WinnerFrag.WinCo
     public void newGame() {
         draw();
     }
-    void showDialog(String winner, int white, int black){
-        DialogFragment newWinFrag = WinnerFrag.newInstance(winner,white,black);
-        newWinFrag.show(getFragmentManager(), "dialog");
-    }
 
-    public void doOnPositiveClick() {
-        wScore = 0;
-        bScore = 0;
-        resetGame();
-
-    }
-
-    public void doOnNegativeClick() {
-        Intent intent = new Intent(context, MainActivity.class);
-        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-        startActivity(intent);
-
-    }
 
     public class Position {
         float x;
@@ -555,6 +538,25 @@ public class GamePlus extends MainActivity implements Runnable, WinnerFrag.WinCo
         //System.out.print ("4.No Winner!\n");
         return 0;
     }
+    public void showDialog(String winner, int white, int black){
+        FragmentManager wfM = getFragmentManager();
+        WinnerFrag newWinFrag = WinnerFrag.newInstance(winner, white, black);
+        newWinFrag.show(wfM, "WinDialog");
+    }
+
+    public void doOnPositiveClick(DialogFragment dialog) {
+        wScore = 0;
+        bScore = 0;
+        resetGame();
+
+    }
+
+    public void doOnNegativeClick(DialogFragment dialog) {
+        Intent intent = new Intent(context, MainActivity.class);
+        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        startActivity(intent);
+
+    }
 
     public void displayWinner (int winner, String dir) {
         Toast toast = new Toast(context);
@@ -571,9 +573,10 @@ public class GamePlus extends MainActivity implements Runnable, WinnerFrag.WinCo
         TextView textView = (TextView)((Activity) context).findViewById(R.id.test);
         textView.setText("White: "+wScore+" Black: "+bScore+"\n");
         msg = String.format("%s Won %s", who, dir);
-        if(wScore >= 1 || bScore >=1)
-            showDialog(who, wScore, bScore);
-
+        if(wScore >= 1 || bScore >=1) {
+            WinnerFrag newWinFrag = WinnerFrag.newInstance(who, wScore, bScore);
+            newWinFrag.show(getFragmentManager(), "WinDialog");
+        }
 
         toast.setView(mLayout);
         toast.setGravity(Gravity.CENTER|Gravity.TOP, 0, 0);
