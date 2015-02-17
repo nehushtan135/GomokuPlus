@@ -56,7 +56,8 @@ import android.widget.Toast;
         private ArrayAdapter<String> mArrayAdapter;
         //protected BroadcastReceiver mReceiver;
         private BluetoothAdapter BA;
-
+        private boolean YesClient;
+        private String str;
 
         // Unique UUID for this application
         private static final UUID MY_UUID_INSECURE =
@@ -103,6 +104,7 @@ import android.widget.Toast;
             String who = "";
 
 
+
             mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
             if (mBluetoothAdapter == null) {
                 msg = String.format("%s Won %s", who, "Device does not support bluetooth");
@@ -118,9 +120,8 @@ import android.widget.Toast;
                 Toast.makeText(getApplicationContext(), "Already on",
                         Toast.LENGTH_LONG).show();
             }
-            //Start Server on both devices
-            mAcceptThread=new AcceptThread();
-            mAcceptThread.start();
+
+
 
             //DEVICES NEED TO BE PAIRED BEFORE THIS
             pairedDevices = mBluetoothAdapter.getBondedDevices();
@@ -139,25 +140,62 @@ import android.widget.Toast;
                 @Override
                 public void onItemClick(AdapterView<?> parent, View view,
                                         int position, long id) {
-                    String str = ((TextView) view).getText().toString();
+                    str = ((TextView) view).getText().toString();
 
-                    //DEVICES NEED TO BE PAIRED BEFORE THIS
-                    pairedDevices = mBluetoothAdapter.getBondedDevices();
-                    for (BluetoothDevice bt : pairedDevices) {
-                        if (bt.getName().contentEquals(str)) {
-                            registerReceiver(myBluetoothReceiver, new IntentFilter(BluetoothDevice.ACTION_FOUND));
-                            registerReceiver(myBluetoothReceiver, new IntentFilter(BluetoothDevice.ACTION_ACL_CONNECTED));
-                            registerReceiver(myBluetoothReceiver, new IntentFilter(BluetoothDevice.ACTION_ACL_DISCONNECTED));
-                            // Start the connection to this device. I am client
-                            mConnectThread=new ConnectThread(bt);
-                            mConnectThread.start();
-                            //Now I am client, so cancel my server listener
-                            mAcceptThread.cancel();
-                        }
-                    }
-                    Toast.makeText(getBaseContext(), "Connecting to " + str, Toast.LENGTH_LONG).show();
-                    // ** for this
-                    //Toast.makeText(getBaseContext(),str.substring(str.length() -17 ),Toast.LENGTH_LONG).show();
+                    // Do not start Server on both devices. Need to show dialog box to start server or not here
+
+                    AlertDialog.Builder alertDialog2 = new AlertDialog.Builder(Multiplayerconnection.this);
+
+                    // Setting Dialog Title
+                    alertDialog2.setTitle("Confirm Server");
+
+                    // Setting Dialog Message
+                    alertDialog2.setMessage("Run server?");
+
+                    // Setting Icon to Dialog
+                    alertDialog2.setIcon(R.drawable.ic_launcher);
+
+                    // Setting Positive "Yes" Btn
+                    alertDialog2.setPositiveButton("YES",
+                            new DialogInterface.OnClickListener() {
+                                public void onClick(DialogInterface dialog, int which) {
+                                    // Start Server
+                                    mAcceptThread = new AcceptThread();
+                                    mAcceptThread.start();
+                                    Toast.makeText(getApplicationContext(),
+                                            "Starting Server listener, Will block until client connects", Toast.LENGTH_SHORT)
+                                            .show();
+                                }
+                            });
+                    // Setting Negative "NO" Btn
+                    alertDialog2.setNegativeButton("NO",
+                            new DialogInterface.OnClickListener() {
+                                public void onClick(DialogInterface dialog, int which) {
+                                    // Set Client
+                                    // YesClient = true;
+                                    pairedDevices = mBluetoothAdapter.getBondedDevices();
+                                    for (BluetoothDevice bt : pairedDevices) {
+                                        if (bt.getName().contentEquals(str)) {
+                                            registerReceiver(myBluetoothReceiver, new IntentFilter(BluetoothDevice.ACTION_FOUND));
+                                            registerReceiver(myBluetoothReceiver, new IntentFilter(BluetoothDevice.ACTION_ACL_CONNECTED));
+                                            registerReceiver(myBluetoothReceiver, new IntentFilter(BluetoothDevice.ACTION_ACL_DISCONNECTED));
+                                            // Start the connection to this device. I am client
+                                            mConnectThread = new ConnectThread(bt);
+                                            mConnectThread.start();
+
+                                        }
+                                    }
+                                    Toast.makeText(getApplicationContext(),
+                                            "Connecting as client to Server"+ str, Toast.LENGTH_SHORT)
+                                            .show();
+                                    dialog.cancel();
+                                }
+                            });
+
+                    // Showing Alert Dialog
+                    alertDialog2.show();
+
+
                 }
             });
         }
