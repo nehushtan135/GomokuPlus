@@ -19,6 +19,7 @@ import android.widget.Toast;
 
 
 public class WinnerFrag extends DialogFragment {
+    
 
     public static WinnerFrag newInstance(String winner,int wScore, int bScore) {
         WinnerFrag winFrag = new WinnerFrag();
@@ -51,14 +52,14 @@ public class WinnerFrag extends DialogFragment {
         builder.setNegativeButton(R.string.winExit, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-                winCom.doOnNegativeClick(WinnerFrag.this);
+                ((GamePlus)getActivity()).doOnPositiveClick(WinnerFrag.this);
                 dismiss();
             }
         });
         builder.setPositiveButton(R.string.winReset, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-                winCom.doOnPositiveClick(WinnerFrag.this);
+                ((GamePlus)getActivity()).doOnPositiveClick(WinnerFrag.this);
 
             }
         });
