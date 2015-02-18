@@ -15,6 +15,7 @@
     <string name="ruleString">How To Play</string>
     <string name="ruleString2">Be the first to create EXACTLY 5 adjacent stones of the same color VERTICALLY, HORIZONTALLY or DIAGONALLY. \n\nThe line must not be blocked at both ends.</string>
     <string name="title_activity_new_game">NewGame</string>
+    <string name="title_activity_Multiplayer">Multiplayer</string>
     <string name="NewGameText">New Game Page</string>
     <string name="HowToPlay">How To Play</string>
     <string name="Help">Help</string>
