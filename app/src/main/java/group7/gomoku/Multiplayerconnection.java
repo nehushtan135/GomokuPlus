@@ -4,49 +4,35 @@ package group7.gomoku;
  * Created by purva on 11-Feb-15.
  */
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import android.os.Handler;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.OutputStream;
-import java.io.PrintWriter;
-import java.net.UnknownHostException;
-    import java.io.IOException;
-import java.util.List;
-import java.util.Set;
-    import java.util.UUID;
-    //import org.anddev.andengine.util.Debug;
-   //import org.d.andengine.util.Debug;
-    import java.util.ArrayList;
-    import android.app.Activity;
-    import android.app.AlertDialog;
-    import android.bluetooth.BluetoothAdapter;
-    import android.bluetooth.BluetoothDevice;
-    import android.bluetooth.BluetoothServerSocket;
-    import android.bluetooth.BluetoothSocket;
-    import android.content.BroadcastReceiver;
-    import android.content.Context;
-    import android.content.DialogInterface;
-    import android.content.Intent;
-    import android.content.IntentFilter;
-    import android.os.Bundle;
-    import android.os.Debug;
-import android.os.Message;
+import android.app.AlertDialog;
+import android.bluetooth.BluetoothAdapter;
+import android.bluetooth.BluetoothDevice;
+import android.bluetooth.BluetoothServerSocket;
+import android.bluetooth.BluetoothSocket;
+import android.content.BroadcastReceiver;
+import android.content.Context;
+import android.content.DialogInterface;
+import android.content.Intent;
+import android.content.IntentFilter;
+import android.os.Bundle;
 import android.view.View;
-    import android.widget.AdapterView;
-    import android.widget.AdapterView.OnItemClickListener;
-    import android.widget.ArrayAdapter;
-    import android.widget.GridView;
+import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemClickListener;
+import android.widget.ArrayAdapter;
+import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
-    import java.util.Set;
-    import android.widget.ListView;
-   // import static android.support.v4.app.ActivityCompat.startActivityForResult;
-    import static android.widget.Toast.makeText;
+
+import java.io.IOException;
+import java.util.Set;
+import java.util.UUID;
+
+//import org.anddev.andengine.util.Debug;
+//import org.d.andengine.util.Debug;
+// import static android.support.v4.app.ActivityCompat.startActivityForResult;
 
 
-    public class Multiplayerconnection extends Activity {
+    public class Multiplayerconnection extends MainActivity {
         public BluetoothAdapter mBluetoothAdapter;
         private ListView lv;
         // Intent request codes
@@ -101,14 +87,14 @@ import android.widget.Toast;
             super.onCreate(savedInstanceState);
             setContentView(R.layout.activity_multiplayerconnection);
             CharSequence msg;
-            String who = "";
+            //String who = "";
 
 
 
             mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
-            if (mBluetoothAdapter == null) {
-                msg = String.format("%s Won %s", who, "Device does not support bluetooth");
-            }
+            //if (mBluetoothAdapter == null) {
+            //    msg = String.format("Device does not support bluetooth");
+            // }
 
             if (!mBluetoothAdapter.isEnabled()) {
                 Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
@@ -150,10 +136,10 @@ import android.widget.Toast;
                     alertDialog2.setTitle("Confirm Server");
 
                     // Setting Dialog Message
-                    alertDialog2.setMessage("Run server?");
+                    alertDialog2.setMessage("Run as a server?");
 
                     // Setting Icon to Dialog
-                    alertDialog2.setIcon(R.drawable.ic_launcher);
+                    alertDialog2.setIcon(R.drawable.icon);
 
                     // Setting Positive "Yes" Btn
                     alertDialog2.setPositiveButton("YES",
@@ -163,7 +149,7 @@ import android.widget.Toast;
                                     mAcceptThread = new AcceptThread();
                                     mAcceptThread.start();
                                     Toast.makeText(getApplicationContext(),
-                                            "Starting Server listener, Will block until client connects", Toast.LENGTH_SHORT)
+                                            "Starting Server listener, will block until client connects", Toast.LENGTH_SHORT)
                                             .show();
                                 }
                             });
@@ -222,9 +208,11 @@ import android.widget.Toast;
                 while (true) {
                     try {
                         socket = mmServerSocket.accept();
+
                         Multiplayer.setBluetoothSocket(socket);
+                        Multiplayer.setWho(1); // Server
                         Intent i = new Intent(Multiplayerconnection.this, Multiplayer.class);
-                        finish();
+                        //finish();
                         startActivity(i);
                     } catch (IOException e) {
                         break;
@@ -282,10 +270,10 @@ import android.widget.Toast;
 
 
                     mmSocket.connect();
-
                     Multiplayer.setBluetoothSocket(mmSocket);
+                    Multiplayer.setWho (2); // client!
                     Intent i=new Intent(Multiplayerconnection.this,Multiplayer.class);
-                    finish();
+                    //finish();
                     //Debug.d("BLUETOOTH SOCKET CONNECTED");
                     startActivity(i);
 
