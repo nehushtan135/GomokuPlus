@@ -1,10 +1,16 @@
 package group7.gomoku;
 
-import android.app.Activity;
 import android.bluetooth.BluetoothSocket;
-import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
-
+import android.preference.PreferenceManager;
+import android.view.Menu;
+import android.view.MenuItem;
+import android.view.SurfaceHolder;
+import android.view.SurfaceView;
+import android.widget.Button;
+import android.widget.ImageButton;
+import android.widget.TextView;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -18,26 +24,71 @@ import java.net.UnknownHostException;
  *
  * https://github.com/dipenpradhan/bot-wars/blob/master/src/botwars/main/
  */
-public class Multiplayer extends Activity
+public class Multiplayer extends MainActivity implements SurfaceHolder.Callback
 {
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-    }
     public Boolean isRunning = false;
     private static BluetoothSocket mSocket;
     private OutputStream mOutputStream;
     private PrintWriter mPrintWriterOut;
     private BufferedReader mBufferedReader;
 
-    public static void setBluetoothSocket(BluetoothSocket Socket)
-    {
-        mSocket=Socket;
-        // You have the socket for send and receive of messages
-        // Remaining code for multiplayer game goes here
-    }
+    // Server: 1 (White)
+    // Client: 2 (Black)
+    private static int who;
 
-    Multiplayer() {
+    Button btnPass;
+    ImageButton btnPause;
+    TextView textViewTime;
+    String cTime;
+    GamePlus mGameMulti;
+    private SharedPreferences sharedPrefs;
+
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_multiplayer);
+        SurfaceView sv = (SurfaceView)findViewById(R.id.surfaceView);
+
+        PreferenceManager.setDefaultValues(this, R.xml.preferences, false);
+        sharedPrefs = PreferenceManager.getDefaultSharedPreferences(this);
+        String size = sharedPrefs.getString("pref_boardsize", "15");
+
+        mGameMulti = new GamePlus(this, sv, Integer.parseInt(size), 0, 0);
+        sv.getHolder().addCallback(this);
+
+        btnPass = (Button) findViewById(R.id.btnPass);
+        btnPause = (ImageButton) findViewById(R.id.btn_pause);
+        textViewTime = (TextView) findViewById(R.id.textViewTime);
+
+        textViewTime.setText("03:00");
+        /*
+        final CounterClass timer = new CounterClass(180000,1000);
+
+        timer.start();
+        //btnPass.setBackgroundColor(BLUE);
+        btnPause.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                timer.cancel();
+                FragmentManager fM = getFragmentManager();
+                PauseFragment pF = new PauseFragment();
+                pF.show(fM,"PauseFragment");
+
+
+            }
+
+        } );
+        btnPass.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                timer.start();
+                mGame.changeTurn();
+            }
+        })
+
+        */
+
         try {
             mBufferedReader = new BufferedReader(new InputStreamReader(mSocket.getInputStream()));
             mOutputStream = mSocket.getOutputStream();
@@ -47,21 +98,62 @@ public class Multiplayer extends Activity
         } catch (IOException e) {
             System.out.println("Error Creating socket");
         }
-        startReceivingThread();
-        sendMessage ("Do,you,see");
 
+        if (who == 1)
+            sendMessage ("1,2,3");
+
+        startReceivingThread();
+
+        if (who == 2)
+            sendMessage("4,5,6");
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        // Inflate the menu; this adds items to the action bar if it is present.
+        //getMenuInflater().inflate(R.menu.menu_new_game, menu);
+        super.onCreateOptionsMenu(menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        // Handle action bar item clicks here. The action bar will
+        // automatically handle clicks on the Home/Up button, so long
+        // as you specify a parent activity in AndroidManifest.xml.
+        int id = item.getItemId();
+
+        //noinspection SimplifiableIfStatement
+        if (id == R.id.action_settings) {
+            return true;
+        }
+
+        return super.onOptionsItemSelected(item);
+    }
+
+    public static void setBluetoothSocket(BluetoothSocket Socket)
+    {
+        mSocket=Socket;
+    }
+
+    // 1: Server
+    // 2: Client
+    public static void setWho (int i) {
+        who = i;
     }
 
     public void sendMessage(String str){
         mPrintWriterOut.println(str);
         mPrintWriterOut.flush();
+        System.out.printf("Sent: %s\n", str);
+
     }
 
     public String receiveMessage() {
         String receivedMessage ="";
         try {
             receivedMessage = new String (mBufferedReader.readLine()+"\n");
-            //receivedMessage.trim();
+            receivedMessage.trim();
             return receivedMessage;
         } catch (IOException e) {
             System.out.println ("error reading stream.\n");
@@ -95,8 +187,19 @@ public class Multiplayer extends Activity
 
         System.out.printf ("%s", msg);
 
-        sendMessage("I,got,it");
     }
 
+    @Override
+    public void surfaceCreated(SurfaceHolder holder) {
+        mGameMulti.draw();
+    }
+
+    @Override
+    public void surfaceChanged(SurfaceHolder holder, int frmt, int w, int h) {
+        mGameMulti.draw();
+    }
+
+    @Override
+    public void surfaceDestroyed(SurfaceHolder holder) {}
 
 }
