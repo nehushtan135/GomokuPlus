@@ -14,7 +14,6 @@ import android.view.SurfaceView;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import java.io.BufferedReader;
@@ -23,8 +22,6 @@ import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.net.UnknownHostException;
-
-import static android.app.PendingIntent.getActivity;
 
 /**
  * Created by dany on 2/19/2015.
@@ -267,7 +264,7 @@ public class GameMultiplayer extends MainActivity implements Runnable {
 
         //if (position.occupy != 0) {
         if (posMatrix[col][row].occupy != 0) {
-            System.out.print("Failed to put stone\n");
+            System.out.printf("Failed to put stone at (%d,%d)\n", col, row);
             return false;
         }
 
@@ -286,8 +283,44 @@ public class GameMultiplayer extends MainActivity implements Runnable {
     }
 
     //only startReceivingThread will call this function.
-    public void updateBoard (float x, float y, int flag, int col, int row) {
-        PutStoneByTouch(flag,x,y);
+    public void updateBoard (int flag, int col, int row) {
+        posMatrix[col][row].imageStone = new ImageView(context);
+
+        if (flag == 1)
+            posMatrix[col][row].imageStone.setImageBitmap(mStoneWhiteScale);
+        else if (flag == 2)
+            posMatrix[col][row].imageStone.setImageBitmap(mStoneBlackScale);
+        else
+            return;
+
+        RelativeLayout.LayoutParams lp = new RelativeLayout.LayoutParams(
+                RelativeLayout.LayoutParams.WRAP_CONTENT, RelativeLayout.LayoutParams.WRAP_CONTENT);
+        lp.addRule(RelativeLayout.ALIGN_PARENT_LEFT);
+        lp.addRule(RelativeLayout.ALIGN_PARENT_TOP);
+        lp.leftMargin = (int)(posMatrix[col][row].x - gridSize /2 + 0.5f);
+        lp.topMargin = (int)(posMatrix[col][row].y - gridSize /2 + 0.5f);
+        posMatrix[col][row].imageStone.setId((int)(posMatrix[col][row].x * 10 + posMatrix[col][row].y));
+        posMatrix[col][row].imageStone.setLayoutParams(lp);
+
+        mLayout.addView(posMatrix[col][row].imageStone);
+
+        // the row and col is confusing!!!! keep this the way it is.
+        posMatrix[row][col].occupy = flag;
+        stoneCounter++;
+
+        checkForWinner(row, col);
+
+        /*for (int j = 0; j <= boardType; j++) {
+            for (int k = 0; k <= boardType; k++)
+                System.out.printf("%d, ", posMatrix[j][k].occupy);
+            System.out.print("\n");
+        }*/
+
+        // we have a tie if the board is completely filled.
+        if (stoneCounter == maxNumStone)
+            displayWinner(-1, "This Game.");
+
+        changeTurn();
     }
 
     public void PutStone(int flag, Position position, int col, int row) {
@@ -314,22 +347,11 @@ public class GameMultiplayer extends MainActivity implements Runnable {
         position.imageStone.setId((int)(position.x * 10 + position.y));
         position.imageStone.setLayoutParams(lp);
 
-        // draw based on the message received
-        /*if (curParty != who){
-            image = position.imageStone;
-            GameMultiplayer.this.runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    mLayout.addView(image);
-                }
-            });
-        }
-        else*/
-            mLayout.addView(position.imageStone);
+        mLayout.addView(position.imageStone);
 
         // send a message
         if (curParty == who) {
-            moveMsg = String.format("updateBoard,%f,%f,%d,%d,%d", position.x, position.y, flag, col, row);
+            moveMsg = String.format("updateBoard,%d,%d,%d", flag, row, col);
             sendMessage(moveMsg);
             System.out.printf ("%d sending %s\n", flag, moveMsg);
         }
@@ -350,9 +372,16 @@ public class GameMultiplayer extends MainActivity implements Runnable {
     public void run() {
     }
 
-    public void resetGame(){
+    public void resetGame() {
         //remove the view from the relative layout and reset the PosMatrix
         int i, j;
+
+        // Problem is if we sleep, we don't see the winner announcement,
+        // and we also don't see the winning stone that was put on the board.
+        /*try {
+            Thread.sleep(5000);
+        } catch (Exception e) {
+        }*/
         for (i = 0; i <= boardType; i++) {
             for (j = 0; j <= boardType; j++){
                 if(posMatrix != null){
@@ -365,6 +394,9 @@ public class GameMultiplayer extends MainActivity implements Runnable {
 
             }
         }
+
+        // White goes first again!
+        curParty = 1;
     }
 
     public Position getNextPosition (int col, int row, int direction) {
@@ -624,7 +656,16 @@ public class GameMultiplayer extends MainActivity implements Runnable {
         toast.setGravity(Gravity.CENTER|Gravity.TOP, 0, 0);
         toast.makeText(context, msg, Toast.LENGTH_LONG).show();
 
-        //resetGame();
+        // TODO try to slow down... since sleep doesn't work...no effect..
+        int stupid1, stupid2;
+        for (int j = 0; j < 10000; j++) {
+            for (int k = 0; k < 1000; k++) {
+                stupid1 = j + k;
+                stupid2 = stupid1;
+            }
+        }
+
+        resetGame();
 
         // ask to START NEW GAME  or EXIT here!!!
 
@@ -633,23 +674,24 @@ public class GameMultiplayer extends MainActivity implements Runnable {
     public void sendMessage(String str){
         gamePrintWriterOut.println(str);
         gamePrintWriterOut.flush();
-        System.out.printf("Sent: %s\n", str);
+        // System.out.printf("Sent: %s\n", str);
 
     }
 
     private void startReceivingThread() {
         //isRunning = true;
-        (new Thread(){
+        new Thread(new Runnable() {
+            @Override
             public void run() {
                 while (true) {
-                    //if (isRunning) {
-                            String[] msgArray;
-                            msgArray = receiveMessage().split(",",6);
+                    final String[] msgArray;
+                    msgArray = receiveMessage().split(",",4);
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
                             handleReceived(msgArray);
-                    //}
-                    //else
-                        // isRunning = false';
-                    //    break;
+                        }
+                    });
                 }
             }
         }).start();
@@ -663,29 +705,20 @@ public class GameMultiplayer extends MainActivity implements Runnable {
             System.out.printf ("Received: %s\n", receivedMessage);
             return receivedMessage;
         } catch (IOException e) {
-            System.out.print("error reading stream");
-            //isRunning=false;
-            //endGame(0);
+            System.out.print("error reading stream.");
         }
         return receivedMessage;
     }
 
-    // Parse the message into proper type then should be able to update the board.
     private void handleReceived(String[] msgArray) {
-        float x, y;
         int occupy, row, col;
-
-        //System.out.printf("%d received: %s %f %f %d %d %d \n",msgArray[3],msgArray[0],msgArray[1],msgArray[2],msgArray[3],msgArray[4],msgArray[5]);
-
         if (msgArray[0].equals("updateBoard")) {
-            x = Float.parseFloat(msgArray[1]);
-            y = Float.parseFloat(msgArray[2]);
-            occupy = Integer.parseInt(msgArray[3]);
-            row = Integer.parseInt(msgArray[4]);
-            col = Integer.parseInt(msgArray[5]);
-
-            updateBoard(x,y,occupy,col,row);
+            occupy = Integer.parseInt(msgArray[1]);
+            col = Integer.parseInt(msgArray[2]);
+            row = Integer.parseInt(msgArray[3]);
+            updateBoard(occupy,col,row);
         }
-
+        else
+            System.out.print ("handleReceived: Not expecting this msg.\n");
     }
 }
