@@ -6,6 +6,7 @@ import android.app.Dialog;
 import android.app.DialogFragment;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.media.AudioManager;
 import android.net.Uri;
 import android.os.Bundle;
@@ -69,6 +70,7 @@ public class PauseFragment extends DialogFragment implements View.OnClickListene
         }
         else if(view.getId() == R.id.pauseExit) {
             // return to main menu
+            pauseCom.onDialogExit();
 
             //get destroy dialog
             dismiss();
@@ -90,6 +92,7 @@ public class PauseFragment extends DialogFragment implements View.OnClickListene
     }
      interface PauseCom {
          public void onDialogResume();
+         public void onDialogExit();
      }
 
 

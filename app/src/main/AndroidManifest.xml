@@ -12,6 +12,11 @@
         android:name="android.permission.WRITE_EXTERNAL_STORAGE"
         android:maxSdkVersion="18" />
     <android:uses-permission android:name="android.permission.READ_PHONE_STATE" />
+    <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" />
+
+    <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" />
+    <uses-permission android:name="android.permission.BLUETOOTH" />
+
     <android:uses-permission
         android:name="android.permission.READ_EXTERNAL_STORAGE"
         android:maxSdkVersion="18" />
@@ -69,12 +74,29 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="group7.gomoku.MainActivity" />
         </activity>
-
+        <activity
+            android:name=".Multiplayerconnection"
+            android:label="@string/title_activity_Multiplayer"
+            android:parentActivityName=".MainActivity"
+            android:screenOrientation="portrait">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="group7.gomoku.MainActivity" />
+        </activity>
         <service
             android:name="group7.gomoku.ServiceAudioPlay"
             android:enabled="true" >
         </service>
 
+        <activity
+            android:name=".Multiplayer"
+            android:label="@string/title_activity_multiplayer"
+            android:parentActivityName=".MainActivity"
+            android:screenOrientation="portrait" >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="group7.gomoku.MainActivity" />
+        </activity>
     </application>
 
 </manifest>

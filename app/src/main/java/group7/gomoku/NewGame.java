@@ -5,6 +5,7 @@ import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.DialogFragment;
 import android.app.FragmentManager;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
@@ -81,13 +82,6 @@ public class NewGame extends MainActivity implements SurfaceHolder.Callback, Pau
         });
     }
 
-
-    public void showDialog(View v) {
-        FragmentManager fM = getFragmentManager();
-        PauseFragment pF = new PauseFragment();
-        pF.show(fM,"Pause");
-    }
-
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
@@ -116,6 +110,13 @@ public class NewGame extends MainActivity implements SurfaceHolder.Callback, Pau
         textViewTime.setText(cTime);
 
 
+    }
+
+    @Override
+    public void onDialogExit() {
+        Intent intent = new Intent(this, MainActivity.class);
+        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        startActivity(intent);
     }
 
 

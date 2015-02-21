@@ -1,10 +1,8 @@
 package group7.gomoku;
 
 import android.app.Activity;
-import android.app.DialogFragment;
-import android.app.FragmentManager;
+import android.bluetooth.BluetoothSocket;
 import android.content.Context;
-import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
@@ -16,15 +14,19 @@ import android.view.SurfaceView;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
-import android.widget.TextView;
 import android.widget.Toast;
 
-import java.util.concurrent.TimeUnit;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.io.PrintWriter;
+import java.net.UnknownHostException;
 
 /**
- * Created by Lai Xu on 15-2-6.
+ * Created by dany on 2/19/2015.
  */
-public class GamePlus extends MainActivity implements Runnable, WinnerFrag.WinCom {
+public class GameMultiplayer extends MainActivity implements Runnable {
     Context context;
     SurfaceView sv;
     int curParty;
@@ -40,8 +42,16 @@ public class GamePlus extends MainActivity implements Runnable, WinnerFrag.WinCo
     //the the layout for the stones
     RelativeLayout mLayout;
 
+    private static BluetoothSocket gameSocket;
+    private OutputStream gameOutputStream;
+    private PrintWriter gamePrintWriterOut;
+    private BufferedReader gameBufferedReader;
+    private static int who;
 
-    GamePlus(Context context, SurfaceView sv, int boardType,int wScore, int bScore) {
+
+
+    GameMultiplayer(Context context, SurfaceView sv, int boardType,int wScore, int bScore, int who) {
+        setupIOStream();
         this.context = context;
         this.sv = sv;
         this.boardType = boardType;
@@ -50,13 +60,35 @@ public class GamePlus extends MainActivity implements Runnable, WinnerFrag.WinCo
         mStoneBlackScale = null;
         mStoneWhiteScale = null;
         curParty = 1;
+
+        // 1: Server
+        // 2: Client
+        this.who = who;
+
         exitGame = false;
         mLayout = (RelativeLayout) (((Activity) context).findViewById(R.id.boardLayout));
-        TextView textView = (TextView)((Activity) context).findViewById(R.id.test);
-        textView.setText("White: "+wScore+" Black: "+bScore+"\n");
         addListenerOnBoard();
+
+        startReceivingThread();
     }
 
+    public static void setBluetoothSocket(BluetoothSocket Socket)
+    {
+        gameSocket=Socket;
+    }
+
+    public void setupIOStream() {
+        // Set up messaging streams
+        try {
+            gameBufferedReader = new BufferedReader(new InputStreamReader(gameSocket.getInputStream()));
+            gameOutputStream = gameSocket.getOutputStream();
+            gamePrintWriterOut = new PrintWriter(gameOutputStream);
+        } catch (UnknownHostException e) {
+            System.out.println("Unknown Server Address");
+        } catch (IOException e) {
+            System.out.println("Error Creating socket");
+        }
+    }
     public void newGame() {
         draw();
     }
@@ -199,8 +231,7 @@ public class GamePlus extends MainActivity implements Runnable, WinnerFrag.WinCo
         sv.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View view, MotionEvent event) {
-
-                if (event.getAction() == MotionEvent.ACTION_DOWN) {
+                if ((event.getAction() == MotionEvent.ACTION_DOWN) && (curParty == who)) {
                     PutStoneByTouch(curParty, event.getX(), event.getY());
                 }
                 return true;
@@ -208,8 +239,10 @@ public class GamePlus extends MainActivity implements Runnable, WinnerFrag.WinCo
         });
     }
 
+    // Only if it's your turn
     public boolean PutStoneByTouch(int flag, float x, float y) {
-
+    //    TextView textView = (TextView)((Activity) context).findViewById(R.id.test);
+    //    textView.setText("White: "+wScore+" Black="+bScore+"\n");
 
         //find right position based on the minimum distance
         Position position = posMatrix[0][0];
@@ -231,23 +264,13 @@ public class GamePlus extends MainActivity implements Runnable, WinnerFrag.WinCo
 
         //if (position.occupy != 0) {
         if (posMatrix[col][row].occupy != 0) {
-            System.out.print("Failed to put stone\n");
+            System.out.printf("Failed to put stone at (%d,%d)\n", col, row);
             return false;
         }
 
-        PutStone(flag, position);
+        PutStone(flag, position, col, row);
         posMatrix[col][row].occupy = flag;
         stoneCounter++;
-
-        /*
-        System.out.print ("posMatrix: ");
-        for (i = 0; i <= boardType; i++) {
-            for (j = 0; j <= boardType; j++){
-                System.out.printf ("%d ", posMatrix[i][j].occupy);
-            }
-            System.out.printf ("\n");
-        }
-        */
 
         checkForWinner(col, row);
 
@@ -259,13 +282,56 @@ public class GamePlus extends MainActivity implements Runnable, WinnerFrag.WinCo
         return true;
     }
 
+    //only startReceivingThread will call this function.
+    public void updateBoard (int flag, int col, int row) {
+        posMatrix[col][row].imageStone = new ImageView(context);
 
-    public void PutStone(int flag, Position position) {
+        if (flag == 1)
+            posMatrix[col][row].imageStone.setImageBitmap(mStoneWhiteScale);
+        else if (flag == 2)
+            posMatrix[col][row].imageStone.setImageBitmap(mStoneBlackScale);
+        else
+            return;
 
+        RelativeLayout.LayoutParams lp = new RelativeLayout.LayoutParams(
+                RelativeLayout.LayoutParams.WRAP_CONTENT, RelativeLayout.LayoutParams.WRAP_CONTENT);
+        lp.addRule(RelativeLayout.ALIGN_PARENT_LEFT);
+        lp.addRule(RelativeLayout.ALIGN_PARENT_TOP);
+        lp.leftMargin = (int)(posMatrix[col][row].x - gridSize /2 + 0.5f);
+        lp.topMargin = (int)(posMatrix[col][row].y - gridSize /2 + 0.5f);
+        posMatrix[col][row].imageStone.setId((int)(posMatrix[col][row].x * 10 + posMatrix[col][row].y));
+        posMatrix[col][row].imageStone.setLayoutParams(lp);
+
+        mLayout.addView(posMatrix[col][row].imageStone);
+
+        // the row and col is confusing!!!! keep this the way it is.
+        posMatrix[row][col].occupy = flag;
+        stoneCounter++;
+
+        checkForWinner(row, col);
+
+        /*for (int j = 0; j <= boardType; j++) {
+            for (int k = 0; k <= boardType; k++)
+                System.out.printf("%d, ", posMatrix[j][k].occupy);
+            System.out.print("\n");
+        }*/
+
+        // we have a tie if the board is completely filled.
+        if (stoneCounter == maxNumStone)
+            displayWinner(-1, "This Game.");
+
+        changeTurn();
+    }
+
+    public void PutStone(int flag, Position position, int col, int row) {
+
+        String moveMsg;
         position.imageStone = new ImageView(context);
+        final ImageView image;
 
         if (1 == flag) {
             position.imageStone.setImageBitmap(mStoneWhiteScale);
+
         } else if (2 == flag) {
             position.imageStone.setImageBitmap(mStoneBlackScale);
         } else {
@@ -273,14 +339,22 @@ public class GamePlus extends MainActivity implements Runnable, WinnerFrag.WinCo
         }
 
         RelativeLayout.LayoutParams lp = new RelativeLayout.LayoutParams(
-                   RelativeLayout.LayoutParams.WRAP_CONTENT, RelativeLayout.LayoutParams.WRAP_CONTENT);
+                RelativeLayout.LayoutParams.WRAP_CONTENT, RelativeLayout.LayoutParams.WRAP_CONTENT);
         lp.addRule(RelativeLayout.ALIGN_PARENT_LEFT);
         lp.addRule(RelativeLayout.ALIGN_PARENT_TOP);
         lp.leftMargin = (int)(position.x - gridSize /2 + 0.5f);
         lp.topMargin = (int)(position.y - gridSize /2 + 0.5f);
         position.imageStone.setId((int)(position.x * 10 + position.y));
         position.imageStone.setLayoutParams(lp);
+
         mLayout.addView(position.imageStone);
+
+        // send a message
+        if (curParty == who) {
+            moveMsg = String.format("updateBoard,%d,%d,%d", flag, row, col);
+            sendMessage(moveMsg);
+            System.out.printf ("%d sending %s\n", flag, moveMsg);
+        }
 
         //position.occupy = flag;
     }
@@ -298,10 +372,16 @@ public class GamePlus extends MainActivity implements Runnable, WinnerFrag.WinCo
     public void run() {
     }
 
-    public void resetGame(){
-
+    public void resetGame() {
         //remove the view from the relative layout and reset the PosMatrix
         int i, j;
+
+        // Problem is if we sleep, we don't see the winner announcement,
+        // and we also don't see the winning stone that was put on the board.
+        /*try {
+            Thread.sleep(5000);
+        } catch (Exception e) {
+        }*/
         for (i = 0; i <= boardType; i++) {
             for (j = 0; j <= boardType; j++){
                 if(posMatrix != null){
@@ -314,6 +394,9 @@ public class GamePlus extends MainActivity implements Runnable, WinnerFrag.WinCo
 
             }
         }
+
+        // White goes first again!
+        curParty = 1;
     }
 
     public Position getNextPosition (int col, int row, int direction) {
@@ -323,34 +406,34 @@ public class GamePlus extends MainActivity implements Runnable, WinnerFrag.WinCo
                 // direction 0: moveRight
                 nextPosition = posMatrix[col++][row];
                 break;
-		    case 1:
-			    // direction 1: moveDownRight
-			    nextPosition = posMatrix[col++][row--];
-			    break;
-		    case 2:
-			    // direction 2: moveDown
-			    nextPosition = posMatrix[col][row--];
-			    break;
-		    case 3:
-			    // direction 3: moveDownLeft
-			    nextPosition = posMatrix[col--][row--];
-			    break;
+            case 1:
+                // direction 1: moveDownRight
+                nextPosition = posMatrix[col++][row--];
+                break;
+            case 2:
+                // direction 2: moveDown
+                nextPosition = posMatrix[col][row--];
+                break;
+            case 3:
+                // direction 3: moveDownLeft
+                nextPosition = posMatrix[col--][row--];
+                break;
             case 4:
                 // direction 4: moveLeft
                 nextPosition = posMatrix[col--][row];
                 break;
-		    case 5:
-			    // direction 5: moveUpLeft
-			    nextPosition = posMatrix[col--][row++];
-			    break;
-		    case 6:
-			    // direction 6: moveUp
-			    nextPosition = posMatrix[col][row++];
-			    break;
-		    case 7:
-			    // direction 7: moveUpRight
-			    nextPosition = posMatrix[col++][row++];
-			    break;
+            case 5:
+                // direction 5: moveUpLeft
+                nextPosition = posMatrix[col--][row++];
+                break;
+            case 6:
+                // direction 6: moveUp
+                nextPosition = posMatrix[col][row++];
+                break;
+            case 7:
+                // direction 7: moveUpRight
+                nextPosition = posMatrix[col++][row++];
+                break;
             default:
                 break;
         }
@@ -547,25 +630,6 @@ public class GamePlus extends MainActivity implements Runnable, WinnerFrag.WinCo
         //System.out.print ("4.No Winner!\n");
         return 0;
     }
-    public void showDialog(String winner, int white, int black){
-        FragmentManager wfM = getFragmentManager();
-        WinnerFrag newWinFrag = WinnerFrag.newInstance(winner, white, black);
-        newWinFrag.show(wfM, "WinDialog");
-    }
-
-    public void doOnPositiveClick() {
-        wScore = 0;
-        bScore = 0;
-        resetGame();
-
-    }
-
-    public void doOnNegativeClick() {
-        Intent intent = new Intent(context, MainActivity.class);
-        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-        startActivity(intent);
-
-    }
 
     public void displayWinner (int winner, String dir) {
         Toast toast = new Toast(context);
@@ -582,8 +646,6 @@ public class GamePlus extends MainActivity implements Runnable, WinnerFrag.WinCo
         else if (winner == -1) {
             who = "No One";
         }
-        TextView textView = (TextView)((Activity) context).findViewById(R.id.test);
-        textView.setText("White: "+wScore+" Black: "+bScore+"\n");
         msg = String.format("%s Won %s", who, dir);
        /* if(wScore >= 1 || bScore >=1) {
             showDialog(who,wScore,bScore);
@@ -594,9 +656,69 @@ public class GamePlus extends MainActivity implements Runnable, WinnerFrag.WinCo
         toast.setGravity(Gravity.CENTER|Gravity.TOP, 0, 0);
         toast.makeText(context, msg, Toast.LENGTH_LONG).show();
 
+        // TODO try to slow down... since sleep doesn't work...no effect..
+        int stupid1, stupid2;
+        for (int j = 0; j < 10000; j++) {
+            for (int k = 0; k < 1000; k++) {
+                stupid1 = j + k;
+                stupid2 = stupid1;
+            }
+        }
+
         resetGame();
 
         // ask to START NEW GAME  or EXIT here!!!
 
+    }
+
+    public void sendMessage(String str){
+        gamePrintWriterOut.println(str);
+        gamePrintWriterOut.flush();
+        // System.out.printf("Sent: %s\n", str);
+
+    }
+
+    private void startReceivingThread() {
+        //isRunning = true;
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                while (true) {
+                    final String[] msgArray;
+                    msgArray = receiveMessage().split(",",4);
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            handleReceived(msgArray);
+                        }
+                    });
+                }
+            }
+        }).start();
+    }
+
+    private String receiveMessage(){
+        String receivedMessage = "";
+        try {
+            receivedMessage = new String(gameBufferedReader.readLine());
+            receivedMessage.trim();
+            System.out.printf ("Received: %s\n", receivedMessage);
+            return receivedMessage;
+        } catch (IOException e) {
+            System.out.print("error reading stream.");
+        }
+        return receivedMessage;
+    }
+
+    private void handleReceived(String[] msgArray) {
+        int occupy, row, col;
+        if (msgArray[0].equals("updateBoard")) {
+            occupy = Integer.parseInt(msgArray[1]);
+            col = Integer.parseInt(msgArray[2]);
+            row = Integer.parseInt(msgArray[3]);
+            updateBoard(occupy,col,row);
+        }
+        else
+            System.out.print ("handleReceived: Not expecting this msg.\n");
     }
 }
