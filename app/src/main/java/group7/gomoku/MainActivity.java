@@ -36,8 +36,7 @@ public class MainActivity extends Activity {
         seButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                //PUT AI CODE HERE
-                //startActivity(new Intent(MainActivity.this, Settings.class));
+                startActivity(new Intent(MainActivity.this, NewGameAI.class));
             }
         });
     }
