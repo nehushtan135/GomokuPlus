@@ -40,8 +40,10 @@ public class Multiplayer extends MainActivity implements SurfaceHolder.Callback
     ImageButton btnPause;
     TextView textViewTime;
     String cTime;
-    GamePlus mGameMulti;
+    GameMultiplayer mGameMulti;
     private SharedPreferences sharedPrefs;
+    String sizeServer="";
+    String sizeClient="";
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -50,11 +52,37 @@ public class Multiplayer extends MainActivity implements SurfaceHolder.Callback
         setContentView(R.layout.activity_multiplayer);
         SurfaceView sv = (SurfaceView)findViewById(R.id.surfaceView);
 
-        PreferenceManager.setDefaultValues(this, R.xml.preferences, false);
-        sharedPrefs = PreferenceManager.getDefaultSharedPreferences(this);
-        String size = sharedPrefs.getString("pref_boardsize", "15");
+        // Set up messaging streams
+        try {
+            mBufferedReader = new BufferedReader(new InputStreamReader(mSocket.getInputStream()));
+            mOutputStream = mSocket.getOutputStream();
+            mPrintWriterOut = new PrintWriter(mOutputStream);
+        } catch (UnknownHostException e) {
+            System.out.println("Unknown Server Address");
+        } catch (IOException e) {
+            System.out.println("Error Creating socket");
+        }
 
-        mGameMulti = new GamePlus(this, sv, Integer.parseInt(size), 0, 0);
+        // The server's preference setting determines the board size
+        if (who == 1) {
+            PreferenceManager.setDefaultValues(this, R.xml.preferences, false);
+            sharedPrefs = PreferenceManager.getDefaultSharedPreferences(this);
+            sizeServer = sharedPrefs.getString("pref_boardsize", "15");
+            String mmsg = String.format("size,%s", sizeServer);
+            sendMessage(mmsg);
+            GameMultiplayer.setBluetoothSocket(mSocket);
+            mGameMulti = new GameMultiplayer(this, sv, Integer.parseInt(sizeServer), 0, 0, 1);
+        }
+        // Client tries to get the board size from the server.
+        else if (who == 2) {
+            while (sizeClient.isEmpty()) {
+                receiveBoardSize();
+                System.out.print ("looping to get sizeClient.\n");
+            }
+            GameMultiplayer.setBluetoothSocket(mSocket);
+            mGameMulti = new GameMultiplayer(this, sv, Integer.parseInt(sizeClient), 0, 0, 2);
+        }
+
         sv.getHolder().addCallback(this);
 
         btnPass = (Button) findViewById(R.id.btnPass);
@@ -88,24 +116,6 @@ public class Multiplayer extends MainActivity implements SurfaceHolder.Callback
         })
 
         */
-
-        try {
-            mBufferedReader = new BufferedReader(new InputStreamReader(mSocket.getInputStream()));
-            mOutputStream = mSocket.getOutputStream();
-            mPrintWriterOut = new PrintWriter(mOutputStream);
-        } catch (UnknownHostException e) {
-            System.out.println("Unknown Server Address");
-        } catch (IOException e) {
-            System.out.println("Error Creating socket");
-        }
-
-        if (who == 1)
-            sendMessage ("1,2,3");
-
-        startReceivingThread();
-
-        if (who == 2)
-            sendMessage("4,5,6");
     }
 
     @Override
@@ -149,18 +159,25 @@ public class Multiplayer extends MainActivity implements SurfaceHolder.Callback
 
     }
 
-    public String receiveMessage() {
+    public boolean receiveBoardSize() {
         String receivedMessage ="";
+        String[] msgArray;
         try {
-            receivedMessage = new String (mBufferedReader.readLine()+"\n");
+            //receivedMessage = new String (mBufferedReader.readLine()+"\n");
+            receivedMessage = new String (mBufferedReader.readLine());
             receivedMessage.trim();
-            return receivedMessage;
+            msgArray = receivedMessage.split(",",2);
+            if (msgArray[0].equals("size")) {
+                sizeClient = msgArray[1];
+                System.out.printf("set sizeClient!!! %s \n", sizeClient);
+                return true;
+            }
         } catch (IOException e) {
             System.out.println ("error reading stream.\n");
-            isRunning = false;
+            //isRunning = false;
             //endGame();
         }
-        return receivedMessage;
+        return false;
     }
 
     private void startReceivingThread() {
@@ -169,9 +186,9 @@ public class Multiplayer extends MainActivity implements SurfaceHolder.Callback
             public void run() {
                 while (true) {
                     if (isRunning) {
-                        String[] msgArray;
-                        msgArray = receiveMessage().split(",",3);
-                        handleReceivedMessage(msgArray);
+                    //    String[] msgArray;
+                    //    msgArray = receiveMessage().split(",",3);
+                    //    handleReceived(msgArray);
                     }
                     else
                         // isRunning = false';
@@ -182,8 +199,11 @@ public class Multiplayer extends MainActivity implements SurfaceHolder.Callback
     }
 
     // Parse the message into proper type then should be able to update the board.
-    private void handleReceivedMessage(String[] msgArray) {
-        String msg = String.format("Received: %s %s %s\n", msgArray[0], msgArray[1], msgArray[2]);
+    private void handleReceived(String[] msgArray) {
+        if (msgArray[0].equals("size"))
+            sizeClient = msgArray[1];
+
+        String msg = String.format("Received: %s %s\n", msgArray[0], msgArray[1]);
 
         System.out.printf ("%s", msg);
 

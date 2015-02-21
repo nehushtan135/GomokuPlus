@@ -69,6 +69,7 @@ public class MainActivity extends Activity {
         exButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                stopMusic();
                 finish();
                 System.exit(0);
             }

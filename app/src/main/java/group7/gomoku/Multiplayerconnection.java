@@ -241,6 +241,10 @@ import java.util.UUID;
             }
         }
 
+        //public void onDestroy() {
+            //unregisterReceiver(myBluetoothReceiver);
+        //}
+
         // Client Thread
         private class ConnectThread extends Thread {
             private final BluetoothSocket mmSocket;
