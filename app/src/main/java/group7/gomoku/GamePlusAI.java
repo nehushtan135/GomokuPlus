@@ -1,11 +1,17 @@
 package group7.gomoku;
 
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.app.DialogFragment;
+import android.app.FragmentManager;
 import android.content.Context;
+import android.content.DialogInterface;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Paint;
+import android.view.ContextThemeWrapper;
 import android.view.Gravity;
 import android.view.MotionEvent;
 import android.view.SurfaceHolder;
@@ -29,6 +35,8 @@ public class GamePlusAI extends MainActivity implements Runnable {
     Bitmap mStoneBlackScale;
     float gridSize;
     int boardType;
+    int maxNumStone;
+    int stoneCounter;
     boolean exitGame;
     //the the layout for the stones
     RelativeLayout mLayout;
@@ -47,6 +55,7 @@ public class GamePlusAI extends MainActivity implements Runnable {
         curParty = 1;
         exitGame = false;
         mLayout = (RelativeLayout) (((Activity) context).findViewById(R.id.boardLayout));
+        displayScore();
         addListenerOnBoard();
 
         gameAI = new GameAI(boardType, 2);
@@ -79,6 +88,8 @@ public class GamePlusAI extends MainActivity implements Runnable {
         final int width = sv.getWidth();
 
         posMatrix = new Position[boardType + 1][boardType + 1];
+        maxNumStone = (boardType+1) * (boardType+1);
+        stoneCounter = 0;
 
         //Calculating the size and position of the board
         float boundWidth = 0;
@@ -202,8 +213,7 @@ public class GamePlusAI extends MainActivity implements Runnable {
     }
 
     public boolean PutStoneByTouch(int flag, float x, float y) {
-        TextView textView = (TextView) ((Activity) context).findViewById(R.id.test);
-        textView.setText("White=" + wScore + " Black=" + bScore + "\n");
+
 
         //find right position based on the minimum distance
         Position position = posMatrix[0][0];
@@ -231,6 +241,7 @@ public class GamePlusAI extends MainActivity implements Runnable {
 
         PutStone(flag, position);
         posMatrix[col][row].occupy = flag;
+        stoneCounter++;
 
         if (true == checkForWinner(col, row)) {
             resetGame();
@@ -322,12 +333,16 @@ public class GamePlusAI extends MainActivity implements Runnable {
 
             }
         }
+        displayScore();
 
         curParty = 1;
 
         gameAI.reset();
     }
-
+    private void displayScore() {
+        TextView textView = (TextView)((Activity) context).findViewById(R.id.test);
+        textView.setText("White: "+wScore+" Black: "+bScore+"\n");
+    }
     public Position getNextPosition(int col, int row, int direction) {
         Position nextPosition = new Position();
         switch (direction) {
@@ -573,15 +588,44 @@ public class GamePlusAI extends MainActivity implements Runnable {
             bScore += 1;
             who = "Black";
         }
-        msg = String.format("%s Won %s", who, dir);
-       /* if(wScore >= 1 || bScore >=1) {
-            showDialog(who,wScore,bScore);
+        else if (winner == -1) {
+            who = "No One";
         }
-*/
+        CharSequence fScore = String.format("White  %s     Black %s",wScore,bScore);
+        TextView textView = (TextView)((Activity) context).findViewById(R.id.test);
+        textView.setText("White: "+wScore+" Black: "+bScore+"\n");
+        msg = String.format("%s Won!!", who);
+        //change for testing to change number of scores needed to win.
+        if(wScore >= 5 || bScore >=5) {
+            ContextThemeWrapper ctw = new ContextThemeWrapper(this,R.style.customDialog);
+            AlertDialog.Builder winDialog = new AlertDialog.Builder(ctw);
+            winDialog.setCancelable(false);
+            winDialog.setTitle(msg);
+            winDialog.setMessage(fScore);
+            winDialog.setPositiveButton(R.string.winReset, new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    wScore = 0;
+                    bScore = 0;
+                    resetGame();
+                }
+            });
+            winDialog.setNegativeButton(R.string.winExit, new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    Intent intent = new Intent(context, MainActivity.class);
+                    intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                    startActivity(intent);
+                }
+            });
+            winDialog.create().show();
+        }
 
         toast.setView(mLayout);
         toast.setGravity(Gravity.CENTER | Gravity.TOP, 0, 0);
         toast.makeText(context, msg, Toast.LENGTH_LONG).show();
+
+        resetGame();
 
         // ask to START NEW GAME  or EXIT here!!!
 
