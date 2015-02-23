@@ -66,6 +66,15 @@
                 android:value="group7.gomoku.MainActivity" />
         </activity>
         <activity
+            android:name=".NewGameAI"
+            android:label="@string/title_activity_ai"
+            android:parentActivityName=".MainActivity"
+            android:screenOrientation="portrait">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="group7.gomoku.MainActivity" />
+        </activity>
+        <activity
             android:name=".Settings"
             android:label="@string/title_activity_settings"
             android:parentActivityName=".MainActivity"
