@@ -1,14 +1,17 @@
 package group7.gomoku;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.app.DialogFragment;
 import android.app.FragmentManager;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Paint;
+import android.view.ContextThemeWrapper;
 import android.view.Gravity;
 import android.view.MotionEvent;
 import android.view.SurfaceHolder;
@@ -24,7 +27,7 @@ import java.util.concurrent.TimeUnit;
 /**
  * Created by Lai Xu on 15-2-6.
  */
-public class GamePlus extends MainActivity implements Runnable, WinnerFrag.WinCom {
+public class GamePlus extends MainActivity implements Runnable {
     Context context;
     SurfaceView sv;
     int curParty;
@@ -52,8 +55,7 @@ public class GamePlus extends MainActivity implements Runnable, WinnerFrag.WinCo
         curParty = 1;
         exitGame = false;
         mLayout = (RelativeLayout) (((Activity) context).findViewById(R.id.boardLayout));
-        TextView textView = (TextView)((Activity) context).findViewById(R.id.test);
-        textView.setText("White: "+wScore+" Black: "+bScore+"\n");
+        displayScore();
         addListenerOnBoard();
     }
 
@@ -314,6 +316,12 @@ public class GamePlus extends MainActivity implements Runnable, WinnerFrag.WinCo
 
             }
         }
+        displayScore();
+    }
+
+    private void displayScore() {
+        TextView textView = (TextView)((Activity) context).findViewById(R.id.test);
+        textView.setText("White: "+wScore+" Black: "+bScore+"\n");
     }
 
     public Position getNextPosition (int col, int row, int direction) {
@@ -547,25 +555,7 @@ public class GamePlus extends MainActivity implements Runnable, WinnerFrag.WinCo
         //System.out.print ("4.No Winner!\n");
         return 0;
     }
-    public void showDialog(String winner, int white, int black){
-        FragmentManager wfM = getFragmentManager();
-        WinnerFrag newWinFrag = WinnerFrag.newInstance(winner, white, black);
-        newWinFrag.show(wfM, "WinDialog");
-    }
 
-    public void doOnPositiveClick() {
-        wScore = 0;
-        bScore = 0;
-        resetGame();
-
-    }
-
-    public void doOnNegativeClick() {
-        Intent intent = new Intent(context, MainActivity.class);
-        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-        startActivity(intent);
-
-    }
 
     public void displayWinner (int winner, String dir) {
         Toast toast = new Toast(context);
@@ -582,13 +572,35 @@ public class GamePlus extends MainActivity implements Runnable, WinnerFrag.WinCo
         else if (winner == -1) {
             who = "No One";
         }
+        CharSequence fScore = String.format("White  %s     Black %s",wScore,bScore);
         TextView textView = (TextView)((Activity) context).findViewById(R.id.test);
         textView.setText("White: "+wScore+" Black: "+bScore+"\n");
-        msg = String.format("%s Won %s", who, dir);
-       /* if(wScore >= 1 || bScore >=1) {
-            showDialog(who,wScore,bScore);
+        msg = String.format("%s Won!!", who);
+        //change for testing to change number of scores needed to win.
+        if(wScore >= 5 || bScore >=5) {
+            ContextThemeWrapper ctw = new ContextThemeWrapper(this,R.style.customDialog);
+            AlertDialog.Builder winDialog = new AlertDialog.Builder(ctw);
+            winDialog.setCancelable(false);
+            winDialog.setTitle(msg);
+            winDialog.setMessage(fScore);
+            winDialog.setPositiveButton(R.string.winReset, new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    wScore = 0;
+                    bScore = 0;
+                    resetGame();
+                }
+            });
+            winDialog.setNegativeButton(R.string.winExit, new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    Intent intent = new Intent(context, MainActivity.class);
+                    intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                    startActivity(intent);
+                }
+            });
+            winDialog.create().show();
         }
-*/
 
         toast.setView(mLayout);
         toast.setGravity(Gravity.CENTER|Gravity.TOP, 0, 0);

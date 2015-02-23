@@ -4,7 +4,6 @@
     tools:context=".MainActivity"
     style="@style/customTheme">
 
-    <!-- to be done later I want to add the icon to the top center of the screen and reduce the size a little-->
     <ImageView
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
@@ -91,7 +90,7 @@
         android:layout_marginLeft="@dimen/ButtonBuffer"
         android:layout_marginRight="@dimen/ButtonBuffer"
         android:layout_marginBottom="@dimen/ButtonBuffer"
-        android:layout_marginTop="@dimen/ButtonBuffer" />
+ />
 
 
 </RelativeLayout>
