@@ -578,7 +578,7 @@ public class GamePlus extends MainActivity implements Runnable {
         msg = String.format("%s Won!!", who);
         //change for testing to change number of scores needed to win.
         if(wScore >= 5 || bScore >=5) {
-            ContextThemeWrapper ctw = new ContextThemeWrapper(this,R.style.customDialog);
+            ContextThemeWrapper ctw = new ContextThemeWrapper(context,R.style.customDialog);
             AlertDialog.Builder winDialog = new AlertDialog.Builder(ctw);
             winDialog.setCancelable(false);
             winDialog.setTitle(msg);
