@@ -1,12 +1,16 @@
 package group7.gomoku;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.bluetooth.BluetoothSocket;
 import android.content.Context;
+import android.content.DialogInterface;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Paint;
+import android.view.ContextThemeWrapper;
 import android.view.Gravity;
 import android.view.MotionEvent;
 import android.view.SurfaceHolder;
@@ -14,6 +18,7 @@ import android.view.SurfaceView;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import java.io.BufferedReader;
@@ -67,6 +72,7 @@ public class GameMultiplayer extends MainActivity implements Runnable {
 
         exitGame = false;
         mLayout = (RelativeLayout) (((Activity) context).findViewById(R.id.boardLayout));
+        displayScore();
         addListenerOnBoard();
 
         startReceivingThread();
@@ -241,8 +247,8 @@ public class GameMultiplayer extends MainActivity implements Runnable {
 
     // Only if it's your turn
     public boolean PutStoneByTouch(int flag, float x, float y) {
-    //    TextView textView = (TextView)((Activity) context).findViewById(R.id.test);
-    //    textView.setText("White: "+wScore+" Black="+bScore+"\n");
+        //    TextView textView = (TextView)((Activity) context).findViewById(R.id.test);
+        //    textView.setText("White: "+wScore+" Black="+bScore+"\n");
 
         //find right position based on the minimum distance
         Position position = posMatrix[0][0];
@@ -394,11 +400,16 @@ public class GameMultiplayer extends MainActivity implements Runnable {
 
             }
         }
+        displayScore();
 
-        // White goes first again!
-        curParty = 1;
+    // White goes first again!
+    curParty = 1;
+}
+
+    private void displayScore() {
+        TextView textView = (TextView) ((Activity) context).findViewById(R.id.test);
+        textView.setText("White: " + wScore + " Black: " + bScore + "\n");
     }
-
     public Position getNextPosition (int col, int row, int direction) {
         Position nextPosition = new Position();
         switch (direction) {
@@ -646,11 +657,36 @@ public class GameMultiplayer extends MainActivity implements Runnable {
         else if (winner == -1) {
             who = "No One";
         }
-        msg = String.format("%s Won %s", who, dir);
-       /* if(wScore >= 1 || bScore >=1) {
-            showDialog(who,wScore,bScore);
+        CharSequence fScore = String.format("White  %s     Black %s",wScore,bScore);
+        TextView textView = (TextView)((Activity) context).findViewById(R.id.test);
+        textView.setText("White: "+wScore+" Black: "+bScore+"\n");
+        msg = String.format("%s Won!!", who);
+        //change for testing to change number of scores needed to win.
+        if(wScore >= 5 || bScore >=5) {
+            ContextThemeWrapper ctw = new ContextThemeWrapper(context,R.style.customDialog);
+            AlertDialog.Builder winDialog = new AlertDialog.Builder(ctw);
+            winDialog.setCancelable(false);
+            winDialog.setTitle(msg);
+            winDialog.setMessage(fScore);
+            winDialog.setPositiveButton(R.string.winReset, new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    wScore = 0;
+                    bScore = 0;
+                    resetGame();
+                }
+            });
+            winDialog.setNegativeButton(R.string.winExit, new DialogInterface.OnClickListener() {
+                @Override
+                //TODO: fix this to go to the right spot, will probably crash app as is.
+                public void onClick(DialogInterface dialog, int which) {
+                    Intent intent = new Intent(context, MainActivity.class);
+                    intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                    startActivity(intent);
+                }
+            });
+            winDialog.create().show();
         }
-*/
 
         toast.setView(mLayout);
         toast.setGravity(Gravity.CENTER|Gravity.TOP, 0, 0);
