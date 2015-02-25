@@ -5,17 +5,16 @@
     style="@style/customTheme">
 
     <ImageView
-        android:layout_width="fill_parent"
-        android:layout_height="fill_parent"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
         android:contentDescription="main_screen"
         android:src="@drawable/gomoku_main"
         android:id="@+id/main_image"
-        android:adjustViewBounds="false"
-        android:cropToPadding="false"
+        android:adjustViewBounds="true"
+        android:cropToPadding="true"
         android:focusable="false"
         android:layout_above="@+id/newGameButton"
-        android:layout_centerHorizontal="true"
-        android:scaleType="centerCrop" />
+        android:layout_centerHorizontal="true" />
 
 
     <Button

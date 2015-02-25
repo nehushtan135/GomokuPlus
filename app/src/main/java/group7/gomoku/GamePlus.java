@@ -2,6 +2,7 @@ package group7.gomoku;
 
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.app.Dialog;
 import android.app.DialogFragment;
 import android.app.FragmentManager;
 import android.content.Context;
@@ -17,6 +18,8 @@ import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.View;
+import android.view.Window;
+import android.view.WindowManager;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
@@ -27,7 +30,7 @@ import java.util.concurrent.TimeUnit;
 /**
  * Created by Lai Xu on 15-2-6.
  */
-public class GamePlus extends MainActivity implements Runnable {
+public class GamePlus extends NewGame implements Runnable {
     Context context;
     SurfaceView sv;
     int curParty;
@@ -255,7 +258,7 @@ public class GamePlus extends MainActivity implements Runnable {
 
         // we have a tie if the board is completely filled.
         if (stoneCounter == maxNumStone)
-            displayWinner(-1, "This Game.");
+            displayWinner(-1, "Tie Game.");
 
         changeTurn();
         return true;
@@ -601,12 +604,41 @@ public class GamePlus extends MainActivity implements Runnable {
             });
             winDialog.create().show();
         }
+        else{
 
+            ContextThemeWrapper mctw = new ContextThemeWrapper(context, R.style.customDialog);
+            AlertDialog.Builder singWinDialog1 = new AlertDialog.Builder(mctw);
+            singWinDialog1.setCancelable(false);
+            singWinDialog1.setTitle(msg);
+            singWinDialog1.setMessage(fScore);
+            //TODO replace with a single neutral button that says continue
+            singWinDialog1.setPositiveButton(R.string.winReset, new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    resetGame();
+                }
+            });
+            singWinDialog1.setNegativeButton(R.string.winExit, new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    Intent intent = new Intent(context, MainActivity.class);
+                    intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                    startActivity(intent);
+                }
+            });
+            Dialog dlg = singWinDialog1.create();
+            Window window = dlg.getWindow();
+            WindowManager.LayoutParams wlp = window.getAttributes();
+            wlp.gravity = Gravity.TOP;
+            wlp.flags &= ~WindowManager.LayoutParams.FLAG_DIM_BEHIND;
+            window.setAttributes(wlp);
+            dlg.show();
+        }
+        /*
         toast.setView(mLayout);
         toast.setGravity(Gravity.CENTER|Gravity.TOP, 0, 0);
         toast.makeText(context, msg, Toast.LENGTH_LONG).show();
-
-        resetGame();
+*/
 
         // ask to START NEW GAME  or EXIT here!!!
 

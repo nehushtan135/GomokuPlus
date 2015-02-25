@@ -36,6 +36,7 @@ public class NewGame extends MainActivity implements SurfaceHolder.Callback, Pau
     TextView textViewTime;
     //ImageView imageBoard;
     String cTime;
+    long   mtime;
     GamePlus mGame;
 
     @Override
@@ -108,8 +109,10 @@ public class NewGame extends MainActivity implements SurfaceHolder.Callback, Pau
     @Override
     public void onDialogResume() {
         textViewTime.setText(cTime);
-
-
+        long resumeTime = mtime;
+        /* TODO get timer so it cancels the previus timer and then starts a new one
+        CounterClass timer1 = new CounterClass(mtime,1000);
+        timer1.start();*/
     }
 
     @Override
@@ -132,6 +135,7 @@ public class NewGame extends MainActivity implements SurfaceHolder.Callback, Pau
                     TimeUnit.MILLISECONDS.toSeconds(millis) - TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes(millis)));
             //cTime is storing the current time left on the clock into a variable that pauseButton onclicklistener can then store to recover on resume.
             cTime = ms;
+            mtime = millis;
 
 
             //System.out.println(ms);
@@ -141,10 +145,14 @@ public class NewGame extends MainActivity implements SurfaceHolder.Callback, Pau
         @Override
         public void onFinish() {
 
-            textViewTime.setText("DONE.");
+            Toast tst = new Toast(NewGame.this);
+            String oops = "You lost your turn!!";
+            tst.makeText(NewGame.this,oops,Toast.LENGTH_LONG);
+            this.start();
+            mGame.changeTurn();
+
         }
     }
-
     @Override
     public void surfaceCreated(SurfaceHolder holder) {
         mGame.draw();
