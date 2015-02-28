@@ -33,6 +33,8 @@ import java.util.concurrent.TimeUnit;
 public class GamePlus extends NewGame implements Runnable {
     Context context;
     SurfaceView sv;
+    TextView tv;
+    ImageView iv;
     int curParty;
     int wScore,bScore;
     Position[][] posMatrix;
@@ -53,6 +55,8 @@ public class GamePlus extends NewGame implements Runnable {
         this.boardType = boardType;
         this.wScore = wScore;
         this.bScore = bScore;
+        this.iv = (ImageView) ((Activity) context).findViewById(R.id.turnIndicate);
+        this.tv = (TextView)((Activity) context).findViewById(R.id.textViewTime);
         mStoneBlackScale = null;
         mStoneWhiteScale = null;
         curParty = 1;
@@ -293,7 +297,11 @@ public class GamePlus extends NewGame implements Runnable {
     public void changeTurn() {
         if(curParty == 1){
             curParty = 2;
+            tv.setText("BLACK");
+            iv.setImageResource(R.drawable.stoneblack);
         }else if(curParty == 2){
+            tv.setText("WHITE");
+            iv.setImageResource(R.drawable.stonewhite);
             curParty = 1;
         }else{
         }
@@ -324,7 +332,7 @@ public class GamePlus extends NewGame implements Runnable {
 
     private void displayScore() {
         TextView textView = (TextView)((Activity) context).findViewById(R.id.test);
-        textView.setText("White: "+wScore+" Black: "+bScore+"\n");
+        textView.setText("White: "+wScore+"\n Black: "+bScore+"\n");
     }
 
     public Position getNextPosition (int col, int row, int direction) {
@@ -610,6 +618,7 @@ public class GamePlus extends NewGame implements Runnable {
             AlertDialog.Builder singWinDialog1 = new AlertDialog.Builder(mctw);
             singWinDialog1.setCancelable(false);
             singWinDialog1.setTitle(msg);
+
             singWinDialog1.setMessage(fScore);
             //TODO replace with a single neutral button that says continue
             singWinDialog1.setPositiveButton(R.string.winReset, new DialogInterface.OnClickListener() {

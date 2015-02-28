@@ -21,6 +21,7 @@ import android.view.SurfaceView;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.view.View.OnClickListener;
 import android.widget.Toast;
@@ -33,10 +34,9 @@ public class NewGame extends MainActivity implements SurfaceHolder.Callback, Pau
     private SharedPreferences sharedPrefs;
     Button btnPass;
     ImageButton btnPause;
-    TextView textViewTime;
-    //ImageView imageBoard;
-    String cTime;
-    long   mtime;
+    ImageView turnInd;
+    TextView textViewTurn;
+    String whos;
     GamePlus mGame;
 
     @Override
@@ -55,17 +55,14 @@ public class NewGame extends MainActivity implements SurfaceHolder.Callback, Pau
 
         btnPass = (Button) findViewById(R.id.btnPass);
         btnPause = (ImageButton) findViewById(R.id.btn_pause);
-        textViewTime = (TextView) findViewById(R.id.textViewTime);
+        textViewTurn = (TextView) findViewById(R.id.textViewTime);
 
-        textViewTime.setText("03:00");
-        final CounterClass timer = new CounterClass(180000,1000);
+        textViewTurn.setText("03:00");
 
-        timer.start();
-        //btnPass.setBackgroundColor(BLUE);
-        btnPause.setOnClickListener(new View.OnClickListener() {
+
+        btnPause.setOnClickListener(new OnClickListener() {
            @Override
            public void onClick(View v) {
-               timer.cancel();
                FragmentManager fM = getFragmentManager();
                PauseFragment pF = new PauseFragment();
                pF.show(fM,"PauseFragment");
@@ -74,10 +71,10 @@ public class NewGame extends MainActivity implements SurfaceHolder.Callback, Pau
            }
 
             } );
-        btnPass.setOnClickListener(new View.OnClickListener() {
+        btnPass.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
-                timer.start();
+
                 mGame.changeTurn();
             }
         });
@@ -108,11 +105,7 @@ public class NewGame extends MainActivity implements SurfaceHolder.Callback, Pau
 
     @Override
     public void onDialogResume() {
-        textViewTime.setText(cTime);
-        long resumeTime = mtime;
-        /* TODO get timer so it cancels the previus timer and then starts a new one
-        CounterClass timer1 = new CounterClass(mtime,1000);
-        timer1.start();*/
+
     }
 
     @Override
@@ -122,7 +115,7 @@ public class NewGame extends MainActivity implements SurfaceHolder.Callback, Pau
         startActivity(intent);
     }
 
-
+/* not using timer anymore but don't want to delete it completely
     public class CounterClass extends CountDownTimer {
         public CounterClass (long millisInFuture, long countDownInterval) {
             super(millisInFuture, countDownInterval);
@@ -153,6 +146,7 @@ public class NewGame extends MainActivity implements SurfaceHolder.Callback, Pau
 
         }
     }
+    */
     @Override
     public void surfaceCreated(SurfaceHolder holder) {
         mGame.draw();
