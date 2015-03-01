@@ -14,7 +14,7 @@
         <ImageButton
             style="@style/GenoaTextStyle"
             android:layout_width="0dp"
-            android:layout_height="wrap_content"
+            android:layout_height="match_parent"
             android:id="@+id/btn_pause"
             android:src="@drawable/ic_action_pause"
             android:layout_alignTop="@+id/textViewTime"
@@ -24,35 +24,41 @@
             android:scaleType="fitCenter"
             android:layout_weight=".2" />
 
-        <TextView
-
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-
-            android:id="@+id/test"
-            android:layout_gravity="center"
-            android:textSize="15sp"
-            android:layout_weight=".45" />
-
         <ImageView
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:id="@+id/turnIndicate"
-            android:layout_weight=".1"
-            />
+            android:layout_weight=".2"
+            android:layout_gravity="right"
+            android:paddingLeft="@dimen/TextSize" />
 
-        <TextView
-            android:id="@+id/textViewTime"
+        <LinearLayout
+            android:orientation="vertical"
             android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_alignParentTop="true"
-            android:layout_toStartOf="@+id/btnPass"
-            android:textSize="20sp"
+            android:layout_height="wrap_content"
+            android:layout_weight=".4">
 
-            android:layout_weight=".25" />
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:textColor="#ffffff"
+
+                android:id="@+id/whiteScore"
+                android:layout_gravity="center" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:textColor="#000000"
+                android:id="@+id/blackScore"
+                android:layout_gravity="center" />
+        </LinearLayout>
 
         <Button
             android:id="@+id/btnPass"
+            android:scaleType="fitCenter"
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:text="@string/passString"

@@ -72,4 +72,6 @@
 
     <color name="backgroundBlue">#144248</color>
     <color name="black">#add8e6</color>
+    <color name="black2">#FFFFFF</color>
+    <color name="white">#000000</color>
 </resources>

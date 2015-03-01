@@ -33,7 +33,6 @@ import java.util.concurrent.TimeUnit;
 public class GamePlus extends NewGame implements Runnable {
     Context context;
     SurfaceView sv;
-    TextView tv;
     ImageView iv;
     int curParty;
     int wScore,bScore;
@@ -56,7 +55,6 @@ public class GamePlus extends NewGame implements Runnable {
         this.wScore = wScore;
         this.bScore = bScore;
         this.iv = (ImageView) ((Activity) context).findViewById(R.id.turnIndicate);
-        this.tv = (TextView)((Activity) context).findViewById(R.id.textViewTime);
         mStoneBlackScale = null;
         mStoneWhiteScale = null;
         curParty = 1;
@@ -297,10 +295,8 @@ public class GamePlus extends NewGame implements Runnable {
     public void changeTurn() {
         if(curParty == 1){
             curParty = 2;
-            tv.setText("BLACK");
             iv.setImageResource(R.drawable.stoneblack);
         }else if(curParty == 2){
-            tv.setText("WHITE");
             iv.setImageResource(R.drawable.stonewhite);
             curParty = 1;
         }else{
@@ -331,8 +327,10 @@ public class GamePlus extends NewGame implements Runnable {
     }
 
     private void displayScore() {
-        TextView textView = (TextView)((Activity) context).findViewById(R.id.test);
-        textView.setText("White: "+wScore+"\n Black: "+bScore+"\n");
+        TextView whiteView = (TextView)((Activity) context).findViewById(R.id.whiteScore);
+        whiteView.setText("White: "+wScore);
+        TextView blackView = (TextView)((Activity) context).findViewById(R.id.blackScore);
+        blackView.setText("Black: " +bScore);
     }
 
     public Position getNextPosition (int col, int row, int direction) {
@@ -584,8 +582,7 @@ public class GamePlus extends NewGame implements Runnable {
             who = "No One";
         }
         CharSequence fScore = String.format("White  %s     Black %s",wScore,bScore);
-        TextView textView = (TextView)((Activity) context).findViewById(R.id.test);
-        textView.setText("White: "+wScore+" Black: "+bScore+"\n");
+        displayScore();
         msg = String.format("%s Won!!", who);
         //change for testing to change number of scores needed to win.
         if(wScore >= 5 || bScore >=5) {

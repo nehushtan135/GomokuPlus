@@ -55,10 +55,6 @@ public class NewGame extends MainActivity implements SurfaceHolder.Callback, Pau
 
         btnPass = (Button) findViewById(R.id.btnPass);
         btnPause = (ImageButton) findViewById(R.id.btn_pause);
-        textViewTurn = (TextView) findViewById(R.id.textViewTime);
-
-        textViewTurn.setText("03:00");
-
 
         btnPause.setOnClickListener(new OnClickListener() {
            @Override
