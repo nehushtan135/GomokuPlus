@@ -2,6 +2,7 @@ package group7.gomoku;
 
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.app.Dialog;
 import android.app.DialogFragment;
 import android.app.FragmentManager;
 import android.content.Context;
@@ -17,6 +18,8 @@ import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.View;
+import android.view.Window;
+import android.view.WindowManager;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
@@ -307,7 +310,9 @@ public class GamePlusAI extends MainActivity implements Runnable {
     public void changeTurn() {
         if (curParty == 1) {
             curParty = 2;
-        } else if (curParty == 2) {
+           // iv.setImageResource(R.drawable.stoneblack);
+        }else if(curParty == 2){
+            //iv.setImageResource(R.drawable.stonewhite);
             curParty = 1;
         } else {
         }
@@ -340,8 +345,10 @@ public class GamePlusAI extends MainActivity implements Runnable {
         gameAI.reset();
     }
     private void displayScore() {
-        TextView textView = (TextView)((Activity) context).findViewById(R.id.test);
-        textView.setText("White: "+wScore+" Black: "+bScore+"\n");
+        TextView whiteView = (TextView)((Activity) context).findViewById(R.id.whiteScore);
+        whiteView.setText("White: "+wScore);
+        TextView blackView = (TextView)((Activity) context).findViewById(R.id.blackScore);
+        blackView.setText("Black: " +bScore);
     }
     public Position getNextPosition(int col, int row, int direction) {
         Position nextPosition = new Position();
@@ -592,8 +599,7 @@ public class GamePlusAI extends MainActivity implements Runnable {
             who = "No One";
         }
         CharSequence fScore = String.format("White  %s     Black %s",wScore,bScore);
-        TextView textView = (TextView)((Activity) context).findViewById(R.id.test);
-        textView.setText("White: "+wScore+" Black: "+bScore+"\n");
+        displayScore();
         msg = String.format("%s Won!!", who);
         //change for testing to change number of scores needed to win.
         if(wScore >= 5 || bScore >=5) {
@@ -620,7 +626,38 @@ public class GamePlusAI extends MainActivity implements Runnable {
             });
             winDialog.create().show();
         }
+        else{
 
+            ContextThemeWrapper mctw = new ContextThemeWrapper(context, R.style.customDialog);
+            AlertDialog.Builder singWinDialog1 = new AlertDialog.Builder(mctw);
+            singWinDialog1.setCancelable(false);
+            singWinDialog1.setTitle(msg);
+
+            singWinDialog1.setMessage(fScore);
+            //TODO replace with a single neutral button that says continue
+            singWinDialog1.setPositiveButton(R.string.winReset, new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    resetGame();
+                }
+            });
+            singWinDialog1.setNegativeButton(R.string.winExit, new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    Intent intent = new Intent(context, MainActivity.class);
+                    intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                    startActivity(intent);
+                }
+            });
+            Dialog dlg = singWinDialog1.create();
+            Window window = dlg.getWindow();
+            WindowManager.LayoutParams wlp = window.getAttributes();
+            wlp.gravity = Gravity.TOP;
+            wlp.flags &= ~WindowManager.LayoutParams.FLAG_DIM_BEHIND;
+            window.setAttributes(wlp);
+            dlg.show();
+        }
+        /*
         toast.setView(mLayout);
         toast.setGravity(Gravity.CENTER | Gravity.TOP, 0, 0);
         toast.makeText(context, msg, Toast.LENGTH_LONG).show();
@@ -628,6 +665,7 @@ public class GamePlusAI extends MainActivity implements Runnable {
         resetGame();
 
         // ask to START NEW GAME  or EXIT here!!!
+        */
 
     }
 }

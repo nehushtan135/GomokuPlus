@@ -1,0 +1,88 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools" android:layout_width="match_parent"
+    android:layout_height="match_parent" android:paddingLeft="@dimen/activity_horizontal_margin"
+    android:paddingRight="@dimen/activity_horizontal_margin"
+    android:paddingTop="@dimen/activity_vertical_margin"
+    android:paddingBottom="@dimen/activity_vertical_margin" tools:context="group7.gomoku.NewGame">
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/menId"
+        style="@style/GenoaTextStyle">
+
+        <ImageButton
+            style="@style/GenoaTextStyle"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:id="@+id/btn_pause"
+            android:src="@drawable/ic_action_pause"
+            android:layout_alignTop="@+id/textViewTime"
+            android:layout_alignBottom="@+id/btnPass"
+            android:onClick="PauseGame"
+            android:nestedScrollingEnabled="false"
+            android:scaleType="fitCenter"
+            android:layout_weight=".2" />
+
+
+
+        <LinearLayout
+            android:orientation="vertical"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight=".55">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:textColor="#ffffff"
+
+                android:id="@+id/whiteScore"
+                android:layout_gravity="center" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:textColor="#000000"
+                android:id="@+id/blackScore"
+                android:layout_gravity="center" />
+        </LinearLayout>
+
+        <Button
+            android:id="@+id/btnPass"
+            android:scaleType="fitCenter"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:text="@string/passString"
+            style="@style/btnStyleGenoa"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentStart="false"
+            android:textSize="15dp"
+            android:layout_weight=".25"
+            android:theme="@style/Base.TextAppearance.AppCompat.Button" />
+
+    </LinearLayout>
+
+    <SurfaceView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/surfaceView"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_below="@+id/menId" />
+
+    <RelativeLayout
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:id="@+id/boardLayout"
+        android:layout_below="@+id/menId"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true"></RelativeLayout>
+
+
+</RelativeLayout>

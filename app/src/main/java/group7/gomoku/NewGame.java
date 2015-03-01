@@ -34,9 +34,6 @@ public class NewGame extends MainActivity implements SurfaceHolder.Callback, Pau
     private SharedPreferences sharedPrefs;
     Button btnPass;
     ImageButton btnPause;
-    ImageView turnInd;
-    TextView textViewTurn;
-    String whos;
     GamePlus mGame;
 
     @Override

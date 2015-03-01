@@ -24,16 +24,13 @@ public class NewGameAI extends MainActivity implements SurfaceHolder.Callback, P
     private SharedPreferences sharedPrefs;
     Button btnPass;
     ImageButton btnPause;
-    TextView textViewTime;
-    //ImageView imageBoard;
-    String cTime;
     GamePlusAI mGame;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        setContentView(R.layout.activity_new_game);
+        setContentView(R.layout.activity_new_game_ai);
         SurfaceView sv = (SurfaceView)findViewById(R.id.surfaceView);
 
         PreferenceManager.setDefaultValues(this, R.xml.preferences, false);
@@ -45,29 +42,22 @@ public class NewGameAI extends MainActivity implements SurfaceHolder.Callback, P
 
         btnPass = (Button) findViewById(R.id.btnPass);
         btnPause = (ImageButton) findViewById(R.id.btn_pause);
-        textViewTime = (TextView) findViewById(R.id.textViewTime);
 
-        textViewTime.setText("03:00");
-        final CounterClass timer = new CounterClass(180000,1000);
-
-        timer.start();
-        //btnPass.setBackgroundColor(BLUE);
         btnPause.setOnClickListener(new OnClickListener() {
-           @Override
-           public void onClick(View v) {
-               timer.cancel();
-               FragmentManager fM = getFragmentManager();
-               PauseFragment pF = new PauseFragment();
-               pF.show(fM,"PauseFragment");
+            @Override
+            public void onClick(View v) {
+                FragmentManager fM = getFragmentManager();
+                PauseFragment pF = new PauseFragment();
+                pF.show(fM,"PauseFragment");
 
 
-           }
+            }
 
-            } );
+        } );
         btnPass.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
-                timer.start();
+
                 mGame.changeTurn();
             }
         });
@@ -98,8 +88,6 @@ public class NewGameAI extends MainActivity implements SurfaceHolder.Callback, P
 
     @Override
     public void onDialogResume() {
-        textViewTime.setText(cTime);
-
 
     }
 
@@ -110,32 +98,32 @@ public class NewGameAI extends MainActivity implements SurfaceHolder.Callback, P
         startActivity(intent);
     }
 
+    /* not using timer anymore but don't want to delete it completely
+        public class CounterClass extends CountDownTimer {
+            public CounterClass (long millisInFuture, long countDownInterval) {
+                super(millisInFuture, countDownInterval);
+            }
 
-    public class CounterClass extends CountDownTimer {
-        public CounterClass (long millisInFuture, long countDownInterval) {
-            super(millisInFuture, countDownInterval);
+            @Override
+            public void onTick (long millisUntilFinished) {
+                long millis = millisUntilFinished;
+                String ms = String.format("%02d:%02d", TimeUnit.MILLISECONDS.toMinutes(millis) - TimeUnit.HOURS.toMinutes(TimeUnit.MILLISECONDS.toHours(millis)),
+                        TimeUnit.MILLISECONDS.toSeconds(millis) - TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes(millis)));
+                //cTime is storing the current time left on the clock into a variable that pauseButton onclicklistener can then store to recover on resume.
+                cTime = ms;
+
+
+                //System.out.println(ms);
+                textViewTime.setText(ms);
+            }
+
+            @Override
+            public void onFinish() {
+
+                textViewTime.setText("DONE.");
+            }
         }
-
-        @Override
-        public void onTick (long millisUntilFinished) {
-            long millis = millisUntilFinished;
-            String ms = String.format("%02d:%02d", TimeUnit.MILLISECONDS.toMinutes(millis) - TimeUnit.HOURS.toMinutes(TimeUnit.MILLISECONDS.toHours(millis)),
-                    TimeUnit.MILLISECONDS.toSeconds(millis) - TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes(millis)));
-            //cTime is storing the current time left on the clock into a variable that pauseButton onclicklistener can then store to recover on resume.
-            cTime = ms;
-
-
-            //System.out.println(ms);
-            textViewTime.setText(ms);
-        }
-
-        @Override
-        public void onFinish() {
-
-            textViewTime.setText("DONE.");
-        }
-    }
-
+        */
     @Override
     public void surfaceCreated(SurfaceHolder holder) {
         mGame.draw();
