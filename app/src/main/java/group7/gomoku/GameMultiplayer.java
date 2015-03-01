@@ -660,9 +660,9 @@ public class GameMultiplayer extends MainActivity implements Runnable {
         CharSequence fScore = String.format("White  %s     Black %s",wScore,bScore);
         TextView textView = (TextView)((Activity) context).findViewById(R.id.test);
         textView.setText("White: "+wScore+" Black: "+bScore+"\n");
-        msg = String.format("%s Won!!", who);
         //change for testing to change number of scores needed to win.
-        if(wScore >= 5 || bScore >=5) {
+        if(wScore >= 3 || bScore >= 3) {
+            msg = String.format("%s Won!!!", who);
             ContextThemeWrapper ctw = new ContextThemeWrapper(context,R.style.customDialog);
             AlertDialog.Builder winDialog = new AlertDialog.Builder(ctw);
             winDialog.setCancelable(false);
@@ -680,27 +680,31 @@ public class GameMultiplayer extends MainActivity implements Runnable {
                 @Override
                 //TODO: fix this to go to the right spot, will probably crash app as is.
                 public void onClick(DialogInterface dialog, int which) {
-                    Intent intent = new Intent(context, MainActivity.class);
-                    intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                    startActivity(intent);
+                    //Intent intent = new Intent(context, MainActivity.class);
+                    //intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                    //startActivity(intent);
+                    finish();
+                    System.exit(0);
                 }
             });
             winDialog.create().show();
         }
-
-        toast.setView(mLayout);
-        toast.setGravity(Gravity.CENTER|Gravity.TOP, 0, 0);
-        toast.makeText(context, msg, Toast.LENGTH_LONG).show();
+        else {
+            msg = String.format("%s Won %s!!!", who, dir);
+            toast.setView(mLayout);
+            toast.setGravity(Gravity.CENTER | Gravity.TOP, 0, 0);
+            toast.makeText(context, msg, Toast.LENGTH_LONG).show();
+        }
 
         // TODO try to slow down... since sleep doesn't work...no effect..
-        int stupid1, stupid2;
-        for (int j = 0; j < 10000; j++) {
-            for (int k = 0; k < 1000; k++) {
+       /* int stupid1, stupid2;
+        for (int j = 0; j < 100000; j++) {
+            for (int k = 0; k < 10000; k++) {
                 stupid1 = j + k;
                 stupid2 = stupid1;
             }
         }
-
+        */
         resetGame();
 
         // ask to START NEW GAME  or EXIT here!!!
