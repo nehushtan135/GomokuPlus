@@ -2,6 +2,7 @@ package group7.gomoku;
 
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.app.Dialog;
 import android.bluetooth.BluetoothSocket;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -16,6 +17,8 @@ import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.View;
+import android.view.Window;
+import android.view.WindowManager;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
@@ -34,6 +37,7 @@ import java.net.UnknownHostException;
 public class GameMultiplayer extends MainActivity implements Runnable {
     Context context;
     SurfaceView sv;
+    ImageView iv;
     int curParty;
     int wScore,bScore;
     Position[][] posMatrix;
@@ -62,6 +66,7 @@ public class GameMultiplayer extends MainActivity implements Runnable {
         this.boardType = boardType;
         this.wScore = wScore;
         this.bScore = bScore;
+        this.iv = (ImageView) ((Activity) context).findViewById(R.id.turnIndicate);
         mStoneBlackScale = null;
         mStoneWhiteScale = null;
         curParty = 1;
@@ -247,8 +252,7 @@ public class GameMultiplayer extends MainActivity implements Runnable {
 
     // Only if it's your turn
     public boolean PutStoneByTouch(int flag, float x, float y) {
-        //    TextView textView = (TextView)((Activity) context).findViewById(R.id.test);
-        //    textView.setText("White: "+wScore+" Black="+bScore+"\n");
+
 
         //find right position based on the minimum distance
         Position position = posMatrix[0][0];
@@ -368,7 +372,9 @@ public class GameMultiplayer extends MainActivity implements Runnable {
     public void changeTurn() {
         if(curParty == 1){
             curParty = 2;
+            iv.setImageResource(R.drawable.stoneblack);
         }else if(curParty == 2){
+            iv.setImageResource(R.drawable.stonewhite);
             curParty = 1;
         }else{
         }
@@ -381,13 +387,6 @@ public class GameMultiplayer extends MainActivity implements Runnable {
     public void resetGame() {
         //remove the view from the relative layout and reset the PosMatrix
         int i, j;
-
-        // Problem is if we sleep, we don't see the winner announcement,
-        // and we also don't see the winning stone that was put on the board.
-        /*try {
-            Thread.sleep(5000);
-        } catch (Exception e) {
-        }*/
         for (i = 0; i <= boardType; i++) {
             for (j = 0; j <= boardType; j++){
                 if(posMatrix != null){
@@ -402,13 +401,15 @@ public class GameMultiplayer extends MainActivity implements Runnable {
         }
         displayScore();
 
-    // White goes first again!
-    curParty = 1;
-}
+        // White goes first again!
+        curParty = 1;
+    }
 
     private void displayScore() {
-        TextView textView = (TextView) ((Activity) context).findViewById(R.id.test);
-        textView.setText("White: " + wScore + " Black: " + bScore + "\n");
+        TextView whiteView = (TextView)((Activity) context).findViewById(R.id.whiteScore);
+        whiteView.setText("White: "+wScore);
+        TextView blackView = (TextView)((Activity) context).findViewById(R.id.blackScore);
+        blackView.setText("Black: " +bScore);
     }
     public Position getNextPosition (int col, int row, int direction) {
         Position nextPosition = new Position();
@@ -658,8 +659,8 @@ public class GameMultiplayer extends MainActivity implements Runnable {
             who = "No One";
         }
         CharSequence fScore = String.format("White  %s     Black %s",wScore,bScore);
-        TextView textView = (TextView)((Activity) context).findViewById(R.id.test);
-        textView.setText("White: "+wScore+" Black: "+bScore+"\n");
+        displayScore();
+        msg = String.format("%s Won!!", who);
         //change for testing to change number of scores needed to win.
         if(wScore >= 3 || bScore >= 3) {
             msg = String.format("%s Won!!!", who);
@@ -689,23 +690,42 @@ public class GameMultiplayer extends MainActivity implements Runnable {
             });
             winDialog.create().show();
         }
-        else {
-            msg = String.format("%s Won %s!!!", who, dir);
-            toast.setView(mLayout);
-            toast.setGravity(Gravity.CENTER | Gravity.TOP, 0, 0);
-            toast.makeText(context, msg, Toast.LENGTH_LONG).show();
-        }
+        else{
 
-        // TODO try to slow down... since sleep doesn't work...no effect..
-       /* int stupid1, stupid2;
-        for (int j = 0; j < 100000; j++) {
-            for (int k = 0; k < 10000; k++) {
-                stupid1 = j + k;
-                stupid2 = stupid1;
-            }
+            ContextThemeWrapper mctw = new ContextThemeWrapper(context, R.style.customDialog);
+            AlertDialog.Builder singWinDialog1 = new AlertDialog.Builder(mctw);
+            singWinDialog1.setCancelable(false);
+            singWinDialog1.setTitle(msg);
+
+            singWinDialog1.setMessage(fScore);
+            //TODO replace with a single neutral button that says continue
+            singWinDialog1.setPositiveButton(R.string.winReset, new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    resetGame();
+                }
+            });
+            singWinDialog1.setNegativeButton(R.string.winExit, new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    Intent intent = new Intent(context, MainActivity.class);
+                    intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                    startActivity(intent);
+                }
+            });
+            Dialog dlg = singWinDialog1.create();
+            Window window = dlg.getWindow();
+            WindowManager.LayoutParams wlp = window.getAttributes();
+            wlp.gravity = Gravity.TOP;
+            wlp.flags &= ~WindowManager.LayoutParams.FLAG_DIM_BEHIND;
+            window.setAttributes(wlp);
+            dlg.show();
         }
-        */
-        resetGame();
+        /*
+        toast.setView(mLayout);
+        toast.setGravity(Gravity.CENTER|Gravity.TOP, 0, 0);
+        toast.makeText(context, msg, Toast.LENGTH_LONG).show();
+*/
 
         // ask to START NEW GAME  or EXIT here!!!
 

@@ -1,6 +1,8 @@
 package group7.gomoku;
 
+import android.app.FragmentManager;
 import android.bluetooth.BluetoothSocket;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
@@ -8,6 +10,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
+import android.view.View;
 import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.TextView;
@@ -24,7 +27,7 @@ import java.net.UnknownHostException;
  *
  * https://github.com/dipenpradhan/bot-wars/blob/master/src/botwars/main/
  */
-public class Multiplayer extends MainActivity implements SurfaceHolder.Callback
+public class Multiplayer extends MainActivity implements SurfaceHolder.Callback, PauseFragment.PauseCom
 {
     public Boolean isRunning = false;
     private static BluetoothSocket mSocket;
@@ -38,8 +41,6 @@ public class Multiplayer extends MainActivity implements SurfaceHolder.Callback
 
     Button btnPass;
     ImageButton btnPause;
-    TextView textViewTime;
-    String cTime;
     GameMultiplayer mGameMulti;
     private SharedPreferences sharedPrefs;
     String sizeServer="";
@@ -87,18 +88,13 @@ public class Multiplayer extends MainActivity implements SurfaceHolder.Callback
 
         btnPass = (Button) findViewById(R.id.btnPass);
         btnPause = (ImageButton) findViewById(R.id.btn_pause);
-        textViewTime = (TextView) findViewById(R.id.textViewTime);
 
-        textViewTime.setText("03:00");
-        /*
-        final CounterClass timer = new CounterClass(180000,1000);
 
-        timer.start();
+
         //btnPass.setBackgroundColor(BLUE);
         btnPause.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                timer.cancel();
                 FragmentManager fM = getFragmentManager();
                 PauseFragment pF = new PauseFragment();
                 pF.show(fM,"PauseFragment");
@@ -110,12 +106,22 @@ public class Multiplayer extends MainActivity implements SurfaceHolder.Callback
         btnPass.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                timer.start();
-                mGame.changeTurn();
+                mGameMulti.changeTurn();
             }
-        })
+        });
 
-        */
+
+    }
+    @Override
+    public void onDialogResume() {
+
+    }
+
+    @Override
+    public void onDialogExit() {
+        Intent intent = new Intent(this, MainActivity.class);
+        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        startActivity(intent);
     }
 
     @Override
