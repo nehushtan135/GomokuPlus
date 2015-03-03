@@ -106,7 +106,10 @@ public class Multiplayer extends MainActivity implements SurfaceHolder.Callback,
         btnPass.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                mGameMulti.changeTurn();
+                if (mGameMulti.getCurrentTurn() == who) {
+                    mGameMulti.changeTurn();
+                    mGameMulti.sendMessage("changeTurn,0,0,0");
+                }
             }
         });
 

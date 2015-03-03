@@ -380,6 +380,10 @@ public class GameMultiplayer extends MainActivity implements Runnable {
         }
     }
 
+    public int getCurrentTurn() {
+        return curParty;
+    }
+
     @Override
     public void run() {
     }
@@ -778,7 +782,10 @@ public class GameMultiplayer extends MainActivity implements Runnable {
             row = Integer.parseInt(msgArray[3]);
             updateBoard(occupy,col,row);
         }
+        else if (msgArray[0].equals("changeTurn")){
+            changeTurn();
+        }
         else
-            System.out.print ("handleReceived: Not expecting this msg.\n");
+            System.out.printf ("handleReceived: Not expecting: %s \n", msgArray[0]);
     }
 }
