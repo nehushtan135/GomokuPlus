@@ -61,6 +61,11 @@ public class GamePlus extends NewGame implements Runnable {
         exitGame = false;
         mLayout = (RelativeLayout) (((Activity) context).findViewById(R.id.boardLayout));
         displayScore();
+
+        //TODO, kind of a messy way to make the turn indicator display, but should work. find a cleaner way if you can
+        changeTurn();
+        changeTurn();
+
         addListenerOnBoard();
     }
 
@@ -569,7 +574,7 @@ public class GamePlus extends NewGame implements Runnable {
     public void displayWinner (int winner, String dir) {
         Toast toast = new Toast(context);
         String who = "";
-        CharSequence msg;
+        CharSequence msg, msg1;
         if (winner == 1) {
             wScore +=1;
             who = "White";
@@ -581,8 +586,10 @@ public class GamePlus extends NewGame implements Runnable {
         else if (winner == -1) {
             who = "No One";
         }
-        CharSequence fScore = String.format("White  %s     Black %s",wScore,bScore);
+        CharSequence fScore = String.format("White %s\nBlack %s",wScore,bScore);
         displayScore();
+
+        msg1 =String.format("%s Scored!!", who);
         msg = String.format("%s Won!!", who);
         //change for testing to change number of scores needed to win.
         if(wScore >= 5 || bScore >=5) {
@@ -602,9 +609,7 @@ public class GamePlus extends NewGame implements Runnable {
             winDialog.setNegativeButton(R.string.winExit, new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialog, int which) {
-                    Intent intent = new Intent(context, MainActivity.class);
-                    intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                    startActivity(intent);
+                  quit();
                 }
             });
             winDialog.create().show();
@@ -614,22 +619,13 @@ public class GamePlus extends NewGame implements Runnable {
             ContextThemeWrapper mctw = new ContextThemeWrapper(context, R.style.customDialog);
             AlertDialog.Builder singWinDialog1 = new AlertDialog.Builder(mctw);
             singWinDialog1.setCancelable(false);
-            singWinDialog1.setTitle(msg);
-
+            singWinDialog1.setTitle(msg1);
             singWinDialog1.setMessage(fScore);
             //TODO replace with a single neutral button that says continue
-            singWinDialog1.setPositiveButton(R.string.winReset, new DialogInterface.OnClickListener() {
+            singWinDialog1.setNeutralButton(R.string.winContinue, new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialog, int which) {
                     resetGame();
-                }
-            });
-            singWinDialog1.setNegativeButton(R.string.winExit, new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialog, int which) {
-                    Intent intent = new Intent(context, MainActivity.class);
-                    intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                    startActivity(intent);
                 }
             });
             Dialog dlg = singWinDialog1.create();
@@ -648,5 +644,10 @@ public class GamePlus extends NewGame implements Runnable {
 
         // ask to START NEW GAME  or EXIT here!!!
 
+    }
+    public void quit(){
+        Intent intent = new Intent(context, MainActivity.class);
+        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        startActivity(intent);
     }
 }
