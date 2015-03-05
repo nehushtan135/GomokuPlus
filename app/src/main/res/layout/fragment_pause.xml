@@ -3,11 +3,13 @@
     android:layout_height="match_parent" tools:context="group7.gomoku.PauseFragment"
     style="@style/customTheme">
 
+
+
     <ImageButton
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:id="@+id/pauseBtn_mute"
-        android:src="@drawable/unmute"
+        android:src="@drawable/gomoku_main_mobile"
         android:background="@null"
         android:contentDescription="option to mute music"
         android:layout_margin="16dp"

@@ -50,19 +50,6 @@
                 android:layout_gravity="center" />
         </LinearLayout>
 
-        <Button
-            android:id="@+id/btnPass"
-            android:scaleType="fitCenter"
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:text="@string/passString"
-            style="@style/btnStyleGenoa"
-            android:layout_alignParentEnd="true"
-            android:layout_alignParentStart="false"
-            android:textSize="15dp"
-            android:layout_weight=".25"
-            android:theme="@style/Base.TextAppearance.AppCompat.Button" />
-
     </LinearLayout>
 
     <SurfaceView

@@ -43,11 +43,10 @@ public class PauseFragment extends DialogFragment implements View.OnClickListene
         getDialog().setTitle("Pause Menu");
         View view = inflater.inflate(R.layout.fragment_pause,container,false);
 
-        muteSound = (ImageButton) view.findViewById(R.id.pauseBtn_mute);
         toResume = (Button) view.findViewById(R.id.pauseResume);
         toExit = (Button) view.findViewById(R.id.pauseExit);
 
-        muteSound.setOnClickListener(this);
+      //  muteSound.setOnClickListener(this);
         toResume.setOnClickListener(this);
         toExit.setOnClickListener(this);
 
@@ -76,18 +75,7 @@ public class PauseFragment extends DialogFragment implements View.OnClickListene
             dismiss();
 
         }
-        // if the mute button is pushed
-        else {
-            dismiss();
-            //AudioManager am = (AudioManager)this. (Context.AUDIO_SERVICE);
 
-            // stop or stop the sound, depending on current setting
-
-            //change image that is displayed again to the opposite of the current setting
-
-            //wait for further button clicks
-
-        }
 
     }
      interface PauseCom {

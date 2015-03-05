@@ -592,7 +592,7 @@ public class GamePlus extends NewGame implements Runnable {
         msg1 =String.format("%s Scored!!", who);
         msg = String.format("%s Won!!", who);
         //change for testing to change number of scores needed to win.
-        if(wScore >= 5 || bScore >=5) {
+        if(wScore >= 3 || bScore >=3) {
             ContextThemeWrapper ctw = new ContextThemeWrapper(context,R.style.customDialog);
             AlertDialog.Builder winDialog = new AlertDialog.Builder(ctw);
             winDialog.setCancelable(false);
@@ -609,7 +609,8 @@ public class GamePlus extends NewGame implements Runnable {
             winDialog.setNegativeButton(R.string.winExit, new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialog, int which) {
-                  quit();
+                    finish();
+                    System.exit(0);
                 }
             });
             winDialog.create().show();
@@ -621,7 +622,6 @@ public class GamePlus extends NewGame implements Runnable {
             singWinDialog1.setCancelable(false);
             singWinDialog1.setTitle(msg1);
             singWinDialog1.setMessage(fScore);
-            //TODO replace with a single neutral button that says continue
             singWinDialog1.setNeutralButton(R.string.winContinue, new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialog, int which) {
@@ -644,10 +644,5 @@ public class GamePlus extends NewGame implements Runnable {
 
         // ask to START NEW GAME  or EXIT here!!!
 
-    }
-    public void quit(){
-        Intent intent = new Intent(context, MainActivity.class);
-        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-        startActivity(intent);
     }
 }

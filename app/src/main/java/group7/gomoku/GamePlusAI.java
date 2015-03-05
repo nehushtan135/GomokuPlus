@@ -587,22 +587,26 @@ public class GamePlusAI extends MainActivity implements Runnable {
     public void displayWinner(int winner, String dir) {
         Toast toast = new Toast(context);
         String who = "";
-        CharSequence msg;
+        CharSequence msg, msg1;
         if (winner == 1) {
-            wScore += 1;
+            wScore +=1;
             who = "White";
-        } else if (winner == 2) {
-            bScore += 1;
+        }
+        else if (winner == 2) {
+            bScore +=1;
             who = "Black";
         }
         else if (winner == -1) {
             who = "No One";
         }
-        CharSequence fScore = String.format("White  %s     Black %s",wScore,bScore);
+        CharSequence fScore = String.format("White %s\nBlack %s",wScore,bScore);
         displayScore();
+
+        msg1 =String.format("%s Scored!!", who);
         msg = String.format("%s Won!!", who);
         //change for testing to change number of scores needed to win.
-        if(wScore >= 5 || bScore >=5) {
+        //todo make this a changable preference but we can leave it at 3 for now
+        if(wScore >= 3 || bScore >=3) {
             ContextThemeWrapper ctw = new ContextThemeWrapper(context,R.style.customDialog);
             AlertDialog.Builder winDialog = new AlertDialog.Builder(ctw);
             winDialog.setCancelable(false);
@@ -619,9 +623,8 @@ public class GamePlusAI extends MainActivity implements Runnable {
             winDialog.setNegativeButton(R.string.winExit, new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialog, int which) {
-                    Intent intent = new Intent(context, MainActivity.class);
-                    intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                    startActivity(intent);
+                    finish();
+                    System.exit(0);
                 }
             });
             winDialog.create().show();
@@ -631,22 +634,12 @@ public class GamePlusAI extends MainActivity implements Runnable {
             ContextThemeWrapper mctw = new ContextThemeWrapper(context, R.style.customDialog);
             AlertDialog.Builder singWinDialog1 = new AlertDialog.Builder(mctw);
             singWinDialog1.setCancelable(false);
-            singWinDialog1.setTitle(msg);
-
+            singWinDialog1.setTitle(msg1);
             singWinDialog1.setMessage(fScore);
-            //TODO replace with a single neutral button that says continue
-            singWinDialog1.setPositiveButton(R.string.winReset, new DialogInterface.OnClickListener() {
+            singWinDialog1.setNeutralButton(R.string.winContinue, new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialog, int which) {
                     resetGame();
-                }
-            });
-            singWinDialog1.setNegativeButton(R.string.winExit, new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialog, int which) {
-                    Intent intent = new Intent(context, MainActivity.class);
-                    intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                    startActivity(intent);
                 }
             });
             Dialog dlg = singWinDialog1.create();
@@ -657,15 +650,5 @@ public class GamePlusAI extends MainActivity implements Runnable {
             window.setAttributes(wlp);
             dlg.show();
         }
-        /*
-        toast.setView(mLayout);
-        toast.setGravity(Gravity.CENTER | Gravity.TOP, 0, 0);
-        toast.makeText(context, msg, Toast.LENGTH_LONG).show();
-
-        resetGame();
-
-        // ask to START NEW GAME  or EXIT here!!!
-        */
-
     }
 }

@@ -22,7 +22,6 @@ import java.util.concurrent.TimeUnit;
 public class NewGameAI extends MainActivity implements SurfaceHolder.Callback, PauseFragment.PauseCom{
 
     private SharedPreferences sharedPrefs;
-    Button btnPass;
     ImageButton btnPause;
     GamePlusAI mGame;
 
@@ -40,7 +39,6 @@ public class NewGameAI extends MainActivity implements SurfaceHolder.Callback, P
         mGame = new GamePlusAI(this, sv, Integer.parseInt(size), 0, 0);
         sv.getHolder().addCallback(this);
 
-        btnPass = (Button) findViewById(R.id.btnPass);
         btnPause = (ImageButton) findViewById(R.id.btn_pause);
 
         btnPause.setOnClickListener(new OnClickListener() {
@@ -54,13 +52,6 @@ public class NewGameAI extends MainActivity implements SurfaceHolder.Callback, P
             }
 
         } );
-        btnPass.setOnClickListener(new OnClickListener() {
-            @Override
-            public void onClick(View v) {
-
-                mGame.changeTurn();
-            }
-        });
     }
 
     @Override
