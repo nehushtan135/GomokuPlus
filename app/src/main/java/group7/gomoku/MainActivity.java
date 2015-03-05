@@ -1,6 +1,7 @@
 package group7.gomoku;
 
 import android.app.Activity;
+import android.bluetooth.BluetoothSocket;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.Menu;
@@ -8,12 +9,15 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageButton;
+import android.widget.Toast;
+
+import java.io.IOException;
 
 
 public class MainActivity extends Activity {
 
     boolean muteAudio = false;
-
+    private static BluetoothSocket mSocket;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -64,12 +68,23 @@ public class MainActivity extends Activity {
         });
     }
 
+    public static void setBluetoothSocket(BluetoothSocket Socket)
+    {
+        mSocket = Socket;
+    }
+
+    public void Socketclose () {
+        if(mSocket != null)
+            GameMultiplayer.sendMessage("disconnect,0,0,0");
+    }
+
     public void setupOnExitClick() {
         Button exButton = (Button) findViewById(R.id.exitButton);
         exButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 stopMusic();
+                Socketclose();
                 finish();
                 System.exit(0);
             }
@@ -95,7 +110,7 @@ public class MainActivity extends Activity {
                 startActivity(new Intent(MainActivity.this, NewGame.class));
                 return true;
             case R.id.exit:
-                finish();
+                Socketclose();
                 System.exit(0);
                 return true;
             case R.id.help:

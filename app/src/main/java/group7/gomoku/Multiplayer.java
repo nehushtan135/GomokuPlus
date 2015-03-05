@@ -1,6 +1,7 @@
 package group7.gomoku;
 
 import android.bluetooth.BluetoothSocket;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
@@ -11,6 +12,7 @@ import android.view.SurfaceView;
 import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -20,7 +22,7 @@ import java.io.PrintWriter;
 import java.net.UnknownHostException;
 
 /**
- * Created by purva on 12-Feb-15.
+ *
  *
  * https://github.com/dipenpradhan/bot-wars/blob/master/src/botwars/main/
  */
@@ -29,12 +31,12 @@ public class Multiplayer extends MainActivity implements SurfaceHolder.Callback
     public Boolean isRunning = false;
     private static BluetoothSocket mSocket;
     private OutputStream mOutputStream;
-    private PrintWriter mPrintWriterOut;
+    private static PrintWriter mPrintWriterOut;
     private BufferedReader mBufferedReader;
 
     // Server: 1 (White)
     // Client: 2 (Black)
-    private static int who;
+    public static int who;
 
     Button btnPass;
     ImageButton btnPause;
@@ -152,11 +154,11 @@ public class Multiplayer extends MainActivity implements SurfaceHolder.Callback
         who = i;
     }
 
-    public void sendMessage(String str){
+
+    public static void sendMessage(String str){
         mPrintWriterOut.println(str);
         mPrintWriterOut.flush();
         System.out.printf("Sent: %s\n", str);
-
     }
 
     public boolean receiveBoardSize() {
@@ -200,8 +202,10 @@ public class Multiplayer extends MainActivity implements SurfaceHolder.Callback
 
     // Parse the message into proper type then should be able to update the board.
     private void handleReceived(String[] msgArray) {
-        if (msgArray[0].equals("size"))
+        if (msgArray[0].equals("size")) {
             sizeClient = msgArray[1];
+
+        }
 
         String msg = String.format("Received: %s %s\n", msgArray[0], msgArray[1]);
 

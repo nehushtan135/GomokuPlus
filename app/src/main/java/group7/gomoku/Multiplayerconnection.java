@@ -45,6 +45,8 @@ import java.util.UUID;
         private boolean YesClient;
         private String str;
 
+
+
         // Unique UUID for this application
         private static final UUID MY_UUID_INSECURE =
                 UUID.fromString("f12aeaf8-b5af-11e4-a71e-12e3f512a338");
@@ -210,6 +212,7 @@ import java.util.UUID;
                         socket = mmServerSocket.accept();
 
                         Multiplayer.setBluetoothSocket(socket);
+                        MainActivity.setBluetoothSocket(socket);
                         Multiplayer.setWho(1); // Server
                         Intent i = new Intent(Multiplayerconnection.this, Multiplayer.class);
                         //finish();
@@ -241,10 +244,6 @@ import java.util.UUID;
             }
         }
 
-        //public void onDestroy() {
-            //unregisterReceiver(myBluetoothReceiver);
-        //}
-
         // Client Thread
         private class ConnectThread extends Thread {
             private final BluetoothSocket mmSocket;
@@ -275,6 +274,7 @@ import java.util.UUID;
 
                     mmSocket.connect();
                     Multiplayer.setBluetoothSocket(mmSocket);
+                    MainActivity.setBluetoothSocket(mmSocket);
                     Multiplayer.setWho (2); // client!
                     Intent i=new Intent(Multiplayerconnection.this,Multiplayer.class);
                     //finish();
@@ -285,6 +285,8 @@ import java.util.UUID;
                 } catch (IOException connectException) {
                     // Unable to connect; close the socket and get out
                     try {
+
+
                         mmSocket.close();
                     } catch (IOException closeException) { }
                     return;

@@ -7,11 +7,15 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Paint;
+import android.util.Log;
+import android.view.ContextThemeWrapper;
 import android.view.Gravity;
+import android.view.KeyEvent;
 import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.View;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.Toast;
@@ -44,10 +48,9 @@ public class GameMultiplayer extends MainActivity implements Runnable {
 
     private static BluetoothSocket gameSocket;
     private OutputStream gameOutputStream;
-    private PrintWriter gamePrintWriterOut;
+    private static PrintWriter gamePrintWriterOut;
     private BufferedReader gameBufferedReader;
     private static int who;
-
 
 
     GameMultiplayer(Context context, SurfaceView sv, int boardType,int wScore, int bScore, int who) {
@@ -223,7 +226,6 @@ public class GameMultiplayer extends MainActivity implements Runnable {
             drawBoard(canvas);
             holder.unlockCanvasAndPost(canvas);
         }
-
     }
 
     public void addListenerOnBoard() {
@@ -237,6 +239,8 @@ public class GameMultiplayer extends MainActivity implements Runnable {
                 return true;
             }
         });
+
+
     }
 
     // Only if it's your turn
@@ -671,7 +675,7 @@ public class GameMultiplayer extends MainActivity implements Runnable {
 
     }
 
-    public void sendMessage(String str){
+    public static void sendMessage(String str){
         gamePrintWriterOut.println(str);
         gamePrintWriterOut.flush();
         // System.out.printf("Sent: %s\n", str);
@@ -718,7 +722,19 @@ public class GameMultiplayer extends MainActivity implements Runnable {
             row = Integer.parseInt(msgArray[3]);
             updateBoard(occupy,col,row);
         }
+        // Close socket if either party exits
+        else if (msgArray[0].equals("disconnect")){
+           try {
+             if(gameSocket != null) {
+                    gameSocket.close();
+                    System.exit(0);
+                }
+           } catch (IOException closeException) {
+            }
+        }
         else
             System.out.print ("handleReceived: Not expecting this msg.\n");
     }
+
+
 }
