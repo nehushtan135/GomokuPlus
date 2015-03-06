@@ -8,8 +8,8 @@
         android:entryValues="@array/pref_boardsize_values"
         android:defaultValue="15" />
 
-    <CheckBoxPreference
+    <!--CheckBoxPreference
         android:key="@string/pref_music"
         android:title="@string/pref_music"
-        android:defaultValue="false" />
+        android:defaultValue="false" /-->
 </PreferenceScreen>

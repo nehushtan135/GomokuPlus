@@ -14,6 +14,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -110,6 +111,8 @@ public class Multiplayer extends MainActivity implements SurfaceHolder.Callback,
                     mGameMulti.changeTurn();
                     mGameMulti.sendMessage("changeTurn,0,0,0");
                 }
+                else
+                    Toast.makeText(getApplicationContext(),"Stop it! It's not your turn.", Toast.LENGTH_SHORT).show();
             }
         });
 

@@ -78,6 +78,11 @@ public class GameMultiplayer extends MainActivity implements Runnable {
         exitGame = false;
         mLayout = (RelativeLayout) (((Activity) context).findViewById(R.id.boardLayout));
         displayScore();
+
+        // hack to display current turn.
+        changeTurn();
+        changeTurn();
+
         addListenerOnBoard();
 
         startReceivingThread();
