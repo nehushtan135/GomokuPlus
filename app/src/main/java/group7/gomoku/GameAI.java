@@ -1,21 +1,31 @@
 package group7.gomoku;
 
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Queue;
 import java.util.Random;
 
 /**
- * Created by Lai Xu on Feb.6.2015.
+ * Feb.6.2015. created by Lai Xu
+ * Mar.3.2015, modified by Lai Xu for integrating biran0079's alpha beta search algorithm to replace
+ *                         previous naive one. The brian0079's original code you can find there
+ *                         https://code.google.com/p/br-gomoku/source/browse/trunk/src/player/AlphaBetaSearch.java
  */
 public class GameAI {
 
     int mBoardSize;   //10, 15, 20
     int mStoneColor;  //1: white, 2:black
     int mOpStoneColor; //1: white, 2:black
-    int mAICharacter; //0:Offensive, 1:Defensive, 2:Smart
-    int[][] mCurBoardMatrix; //0:empty, -1:white, -2:black
-    int[][] mOffensiveMatrix;
-    int[][] mDefensiveMatrix; //0: safety, 1:There is a stone
+    int[][] mCurBoardMatrix; //0:empty, 1:white, 2:black
+
+    private int maxDepth = 1;
+    private int paddingDis = 4;
+
+    final int BLACK_PIECE = 2;
+    final int WHITE_PIECE = 1;
+    final int NOTHING = 0;
+
 
     public class StonePos{
         int x;
@@ -42,16 +52,13 @@ public class GameAI {
 
     public void init() {
 
+
         mCurBoardMatrix = new int[mBoardSize + 1][mBoardSize + 1];
-        mOffensiveMatrix = new int[mBoardSize + 1][mBoardSize + 1];
-        mDefensiveMatrix = new int[mBoardSize + 1][mBoardSize + 1];
 
         int i, j;
         for (i = 0; i <= mBoardSize; i++) {
             for (j = 0; j <= mBoardSize; j++) {
                 mCurBoardMatrix[i][j] = 0;
-                mOffensiveMatrix[i][j] = 0;
-                mDefensiveMatrix[i][j] = 0;
             }
         }
     }
@@ -60,320 +67,185 @@ public class GameAI {
         init();
     }
 
+
+
+    class Node {
+        StonePos p;
+        int f;
+
+        Node(StonePos p, int f) {
+            this.p = p;
+            this.f = f;
+        }
+    }
+
+
+    public StonePos GetPos2() {
+
+        Node res;
+        if (mStoneColor == BLACK_PIECE) {
+            res = maxValue(mCurBoardMatrix, -10000000, 10000000, 0);
+        } else {
+            res = minValue(mCurBoardMatrix, -10000000, 10000000, 0);
+        }
+
+        return res.p;
+    }
+
+    private boolean validPosition(int i, int j){
+        int R = mBoardSize+1, C = mBoardSize+1;
+
+        if (i>=0 && i< R &&
+                j>=0 && j< C){
+            return true;
+        }
+
+        return false;
+    }
+
+    private int eval(int[][] board) {
+        double Ba2 = numOfActive(board, BLACK_PIECE, 2),
+                Wa2 = numOfActive(board, WHITE_PIECE, 2),
+                Ba3 = numOfActive(board, BLACK_PIECE, 3),
+                Wa3 = numOfActive(board, WHITE_PIECE, 3),
+                Ba4 = numOfActive(board, BLACK_PIECE, 4),
+                Wa4 = numOfActive(board, WHITE_PIECE, 4);
+        return (int)(10 * (Ba2 - Wa2) + 100 * (Ba3 - Wa3) + 400 * (Ba4 - Wa4));
+    }
+
+    private double numOfActive(int[][] board, int piece, int n) {
+        int R = mBoardSize+1, C = mBoardSize+1;
+        double res = 0;
+        int deadEnd,l;
+        int[][] d = { { 0, 1 }, { 1, 1 }, { 1, 0 }, { 1, -1 }, { -1, 0 },
+                { -1, -1 }, { 0, -1 }, { 1, -1 } };
+        for (int i = 1; i < R - 1; i++)
+            for (int j = 1; j < C - 1; j++) {
+                for (int k = 0; k < 8; k++) {
+                    if (validPosition(i + n * d[k][0], j + n * d[k][1])){
+                        deadEnd=2;
+                        if(board[i - d[k][0]][j - d[k][1]] != NOTHING)deadEnd--;
+                        if(board[i + n * d[k][0]][j + n * d[k][1]] == NOTHING)deadEnd--;
+                        if(deadEnd==2)continue;
+                        for (l = 0; l < n; l++)
+                            if (board[i + l * d[k][0]][j + l * d[k][1]] != piece)
+                                break;
+                        if (l == n){
+                            res+=deadEnd==0?1:0.8;
+                        }
+                    }
+                }
+            }
+        return res;
+    }
+
+    private void bfs(int[][] board, int[][] dis) {
+        int R = mBoardSize+1, C = mBoardSize+1;
+        int[][] d = { { 1, 0 }, { 1, 1 }, { 0, 1 }, { -1, 1 }, { -1, 0 },
+                { -1, -1 }, { 0, -1 }, { 1, -1 } };
+        Queue<StonePos> q = new LinkedList<StonePos>();
+        for (int i = 0; i < R; i++)
+            for (int j = 0; j < C; j++)
+                if (dis[i][j] == 0)
+                    q.add(new StonePos(i, j));
+        if(q.isEmpty())dis[R/2][C/2]=1;
+        while (!q.isEmpty()) {
+            StonePos t = q.poll();
+            int i, j;
+            for (int k = 0; k < 8; k++) {
+                i = t.x + d[k][0];
+                j = t.y + d[k][1];
+                if (validPosition(i, j) && dis[i][j] == -1) {
+                    dis[i][j] = dis[t.x][t.y] + 1;
+                    if (dis[i][j] < paddingDis)
+                        q.add(new StonePos(i, j));
+                }
+            }
+        }
+    }
+
+
+    private Node maxValue(int[][] board, int a, int b, int dep) {
+        if (playerWins(board, BLACK_PIECE)) {
+            //System.out.print("maxValue Black WIN "+a+" "+b+"\n");
+            return new Node(null, 100000);
+        } else if (playerWins(board, WHITE_PIECE)) {
+            //System.out.print("maxValue White WIN "+a+" "+b+"\n");
+            return new Node(null, -100000);
+        } else if (dep > maxDepth) {
+            return new Node(null, eval(board));
+        }
+
+        int R = mBoardSize+1, C = mBoardSize+1;
+        int[][] dis = new int[R][C];
+        for (int i = 0; i < R; i++)
+            for (int j = 0; j < C; j++)
+                dis[i][j] = (board[i][j] == NOTHING ? -1 : 0);
+        bfs(board, dis);
+        int f = -10000000, t;
+        StonePos p = new StonePos(-1, -1);
+        for (int i = 0; i < R; i++)
+            for (int j = 0; j < C; j++) {
+                if (dis[i][j] > 0) {
+                    board[i][j] = BLACK_PIECE;
+                    t = minValue(board, a, b, dep + 1).f;
+                    //System.out.print("maxValue minValue\n");
+                    if (t > f) {
+                        f = t;
+                        p.x = i;
+                        p.y = j;
+                    }
+                    board[i][j] = NOTHING;
+                    if (f >= b)	return new Node(p, f);
+                    a = Math.max(a, f);
+                }
+            }
+        return new Node(p, f);
+    }
+
+    private Node minValue(int[][] board, int a, int b, int dep) {
+        if (playerWins(board, BLACK_PIECE)) {
+            //System.out.print("minValue Black WIN\n");
+            return new Node(null, 100000);
+        } else if (playerWins(board, WHITE_PIECE)) {
+            //System.out.print("minValue White WIN\n");
+            return new Node(null, -100000);
+        } else if (dep > maxDepth) {
+            return new Node(null, eval(board));
+        }
+
+        int R = mBoardSize+1, C = mBoardSize+1;
+        int[][] dis = new int[R][C];
+        for (int i = 0; i < R; i++)
+            for (int j = 0; j < C; j++)
+                dis[i][j] = (board[i][j] == NOTHING ? -1 : 0);
+        bfs(board, dis);
+        int f = 10000000, t;
+        StonePos p = new StonePos(-1, -1);
+        for (int i = 0; i < R; i++)
+            for (int j = 0; j < C; j++) {
+                if (dis[i][j] > 0) {
+                    board[i][j] = WHITE_PIECE;
+                    t = maxValue(board, a, b, dep + 1).f;
+                    //System.out.print("minValue maxValue\n");
+                    if (t < f) {
+                        f = t;
+                        p.x = i;
+                        p.y = j;
+                    }
+                    board[i][j] = NOTHING;
+                    if (f <= a) return new Node(p, f);
+                    b = Math.min(b, f);
+                }
+            }
+        return new Node(p, f);
+    }
+
+
     public boolean putMyStone(int x, int y) {
 
-        int x1, x2, y1, y2, i, j, w;
-
         mCurBoardMatrix[x][y]  = mStoneColor;
-        mOffensiveMatrix[x][y] = -1 * mStoneColor;
-        mDefensiveMatrix[x][y] = -1 * mStoneColor;
 
-        //Updating Vertically
-        y1 = y-4;
-        if (y1 < 0) {
-            y1 = 0;
-        }
-
-        y2 = y+4;
-        if (y2 > mBoardSize) {
-            y2 = mBoardSize;
-        }
-
-        j = y-1;
-        w = 4;
-        while (j >= y1) {
-
-            if (mOffensiveMatrix[x][j] == -1*mOpStoneColor){
-                break;
-            }
-
-            if (mOffensiveMatrix[x][j] >= 0) {
-                mOffensiveMatrix[x][j] += w;
-            }
-
-            w--;
-            j--;
-        }
-
-        j = y - 1;
-        w = 4;
-        while (j >= y1) {
-            if(mDefensiveMatrix[x][j] == -1*mOpStoneColor){
-                break;
-            }
-
-            if (mDefensiveMatrix[x][j] > 0) {
-                mDefensiveMatrix[x][j]-= w;
-                if(mDefensiveMatrix[x][j]<0){
-                    mDefensiveMatrix[x][j]=0;
-                }
-            }
-
-            w--;
-            j--;
-        }
-
-        j = y + 1;
-        w = 4;
-        while (j <= y2) {
-            if (mOffensiveMatrix[x][j] == -1*mOpStoneColor){
-                break;
-            }
-
-            if (mOffensiveMatrix[x][j] >= 0) {
-                mOffensiveMatrix[x][j] += w;
-            }
-
-            w--;
-            j++;
-        }
-
-        j = y + 1;
-        w = 4;
-        while (j <= y2) {
-
-            if(mDefensiveMatrix[x][j] == -1*mOpStoneColor){
-                break;
-            }
-
-            if (mDefensiveMatrix[x][j] > 0) {
-                mDefensiveMatrix[x][j]-= w;
-                if(mDefensiveMatrix[x][j]<0){
-                    mDefensiveMatrix[x][j]=0;
-                }
-            }
-
-            w--;
-            j++;
-        }
-
-
-        //Horizontally
-        x1 = x - 4;
-        if (x1 < 0) {
-            x1 = 0;
-        }
-
-        x2 = x + 4;
-        if (x2 > mBoardSize) {
-            x2 = mBoardSize;
-        }
-
-        i = x - 1;
-        w = 4;
-
-        while (i >= x1) {
-            if (mOffensiveMatrix[i][y] == -1*mOpStoneColor){
-                break;
-            }
-
-            if (mOffensiveMatrix[i][y] >= 0) {
-                mOffensiveMatrix[i][y] +=w ;
-            }
-            w--;
-            i--;
-        }
-
-        i = x - 1;
-        w = 4;
-        while (i >= x1) {
-            if(mDefensiveMatrix[i][y] == -1*mOpStoneColor){
-                break;
-            }
-
-            if (mDefensiveMatrix[i][y] > 0) {
-                mDefensiveMatrix[i][y] -= w;
-                if(mDefensiveMatrix[i][y]<0){
-                    mDefensiveMatrix[i][y]=0;
-                }
-            }
-            w--;
-            i--;
-        }
-
-        i = x + 1;
-        w=4;
-        while (i <= x2) {
-            if (mOffensiveMatrix[i][y] == -1*mOpStoneColor){
-                break;
-            }
-
-            if (mOffensiveMatrix[i][y] >= 0) {
-                mOffensiveMatrix[i][y]+= w;
-            }
-
-            w--;
-            i++;
-        }
-
-        i = x + 1;
-        w = 4;
-        while (i <= x2) {
-            if(mDefensiveMatrix[i][y] == -1*mOpStoneColor){
-                break;
-            }
-            if (mDefensiveMatrix[i][y] > 0) {
-                mDefensiveMatrix[i][y]-= w;
-                if(mDefensiveMatrix[i][y]<0){
-                    mDefensiveMatrix[i][y]=0;
-                }
-            }
-
-            w--;
-            i++;
-        }
-
-
-        //Diagonally Down
-        i = x - 1;
-        j = y - 1;
-        w = 4;
-        while (i >= x1 && j>=y1) {
-            if (mOffensiveMatrix[i][j] == -1*mOpStoneColor){
-                break;
-            }
-
-            if (mOffensiveMatrix[i][j] >= 0) {
-                mOffensiveMatrix[i][j]+=w;
-            }
-
-            i--;
-            j--;
-            w--;
-        }
-
-        i = x - 1;
-        j = y - 1;
-        w = 4;
-        while (i >= x1 && j>=y1) {
-            if(mDefensiveMatrix[i][j] == -1*mOpStoneColor){
-                break;
-            }
-
-            if (mDefensiveMatrix[i][j] > 0) {
-                mDefensiveMatrix[i][j]-=w;
-                if(mDefensiveMatrix[i][j]<0){
-                    mDefensiveMatrix[i][j]=0;
-                }
-            }
-
-            i--;
-            j--;
-            w--;
-        }
-
-        i = x + 1;
-        j = y + 1;
-        w = 4;
-        while (i <= x2 && j<=y2) {
-            if (mOffensiveMatrix[i][j] == -1*mOpStoneColor){
-                break;
-            }
-
-            if (mOffensiveMatrix[i][j] >= 0) {
-                mOffensiveMatrix[i][j]+=w;
-            }
-
-
-            i++;
-            j++;
-            w--;
-        }
-
-        i = x + 1;
-        j = y + 1;
-        w = 4;
-        while (i <= x2 && j<=y2) {
-            if(mDefensiveMatrix[i][j] == -1*mOpStoneColor){
-                break;
-            }
-
-            if (mDefensiveMatrix[i][j] > 0) {
-                mDefensiveMatrix[i][j]-=w;
-                if(mDefensiveMatrix[i][j]<0){
-                    mDefensiveMatrix[i][j]=0;
-                }
-            }
-
-            i++;
-            j++;
-            w--;
-        }
-
-        //Diagonally Up
-        i = x - 1;
-        j = y + 1;
-        w = 4;
-        while (i >= x1 && j<=y2) {
-            if (mOffensiveMatrix[i][j] == -1*mOpStoneColor){
-                break;
-            }
-
-            if (mOffensiveMatrix[i][j] >= 0) {
-                mOffensiveMatrix[i][j]+=w;
-            }
-
-            i--;
-            j++;
-            w--;
-        }
-
-        i = x - 1;
-        j = y + 1;
-        w = 4;
-        while (i >= x1 && j<=y2) {
-            if(mDefensiveMatrix[i][j] == -1*mOpStoneColor){
-                break;
-            }
-
-            if (mDefensiveMatrix[i][j] > 0) {
-                mDefensiveMatrix[i][j]-=w;
-                if(mDefensiveMatrix[i][j]<0){
-                    mDefensiveMatrix[i][j]=0;
-                }
-            }
-
-            i--;
-            j++;
-            w--;
-        }
-
-        i = x + 1;
-        j = y - 1;
-        w = 4;
-        while (i <= x2 && j>=y1) {
-            if (mOffensiveMatrix[i][j] == -1*mOpStoneColor){
-                break;
-            }
-
-            if (mOffensiveMatrix[i][j] >= 0) {
-                mOffensiveMatrix[i][j]+=w;
-            }
-
-            i++;
-            j--;
-            w--;
-        }
-
-        i = x + 1;
-        j = y - 1;
-        w = 4;
-        while (i <= x2 && j>=y1) {
-            if(mDefensiveMatrix[i][j] == -1*mOpStoneColor){
-                break;
-            }
-
-            if (mDefensiveMatrix[i][j] > 0) {
-                mDefensiveMatrix[i][j]-=w;
-                if(mDefensiveMatrix[i][j]<0){
-                    mDefensiveMatrix[i][j]=0;
-                }
-            }
-
-            i++;
-            j--;
-            w--;
-        }
 
         return true;
     }
@@ -381,352 +253,12 @@ public class GameAI {
 
     public boolean putOpStone(int x, int y) {
 
-        int x1, x2, y1, y2, i, j, w;
-
         mCurBoardMatrix[x][y]  =  mOpStoneColor;
-        mOffensiveMatrix[x][y] = -1 * mOpStoneColor;
-        mDefensiveMatrix[x][y] = -1 * mOpStoneColor;
-
-        //Updating Vertically
-        y1 = y - 4;
-        if (y1 < 0) {
-            y1 = 0;
-        }
-
-        y2 = y + 4;
-        if (y2 > mBoardSize) {
-            y2 = mBoardSize;
-        }
-
-        j = y-1;
-        while (j >= y1) {
-            if (mDefensiveMatrix[x][j] == -1*mStoneColor){
-                break;
-            }
-
-            if (mDefensiveMatrix[x][j] >= 0) {
-                mDefensiveMatrix[x][j]++;
-            }
-
-            j--;
-        }
-
-        j = y - 1;
-        while (j >= y1) {
-            if (mOffensiveMatrix[x][j] == -1*mStoneColor){
-                break;
-            }
-
-            if (mOffensiveMatrix[x][j] > 0) {
-                mOffensiveMatrix[x][j]--;
-            }
-
-            j--;
-        }
-
-        j = y + 1;
-        while (j <= y2) {
-            if (mDefensiveMatrix[x][j] == -1*mStoneColor){
-                break;
-            }
-
-            if (mDefensiveMatrix[x][j] >= 0) {
-                mDefensiveMatrix[x][j]++;
-            }
-
-            j++;
-        }
-
-        j = y + 1;
-        while (j <= y2) {
-
-            if (mOffensiveMatrix[x][j] == -1*mStoneColor){
-                break;
-            }
-
-            if (mOffensiveMatrix[x][j] > 0) {
-                mOffensiveMatrix[x][j]--;
-            }
-
-            j++;
-        }
-
-
-        //Horizontally
-        x1 = x-4;
-        if (x1 < 0) {
-            x1 = 0;
-        }
-
-        x2 = x + 4;
-        if (x2 > mBoardSize) {
-            x2 = mBoardSize;
-        }
-
-        i = x-1;
-        while (i >= x1) {
-            if (mDefensiveMatrix[i][y] == -1*mStoneColor){
-                break;
-            }
-
-            if (mDefensiveMatrix[i][y] >= 0) {
-                mDefensiveMatrix[i][y]++;
-            }
-
-            i--;
-        }
-
-        i = x-1;
-        while (i >= x1) {
-            if (mOffensiveMatrix[i][y] == -1*mStoneColor){
-                break;
-            }
-
-            if (mOffensiveMatrix[i][y] > 0) {
-                mOffensiveMatrix[i][y]--;
-            }
-
-            i--;
-        }
-
-        i = x + 1;
-        while (i <= x2) {
-            if (mDefensiveMatrix[i][y] == -1*mStoneColor){
-                break;
-            }
-
-            if (mDefensiveMatrix[i][y] >= 0) {
-                mDefensiveMatrix[i][y]++;
-            }
-
-            i++;
-        }
-
-        i = x + 1;
-        while (i <= x2) {
-            if (mOffensiveMatrix[i][y] == -1*mStoneColor){
-                break;
-            }
-
-            if (mOffensiveMatrix[i][y] > 0) {
-                mOffensiveMatrix[i][y]--;
-            }
-
-            i++;
-        }
-
-
-        //Diagonally Down
-        i = x - 1;
-        j = y - 1;
-        while (i >= x1 && j>=y1) {
-            if (mDefensiveMatrix[x][j] == -1*mStoneColor){
-                break;
-            }
-
-            if (mDefensiveMatrix[i][j] >= 0) {
-                mDefensiveMatrix[i][j]++;
-            }
-
-            i--;
-            j--;
-        }
-
-        i = x - 1;
-        j = y - 1;
-        while (i >= x1 && j>=y1) {
-            if (mOffensiveMatrix[i][j] == -1*mStoneColor){
-                break;
-            }
-
-            if (mOffensiveMatrix[i][j] > 0) {
-                mOffensiveMatrix[i][j]--;
-            }
-
-            i--;
-            j--;
-        }
-
-        i = x + 1;
-        j = y + 1;
-        while (i <= x2 && j<=y2) {
-            if (mDefensiveMatrix[i][j] == -1*mStoneColor){
-                break;
-            }
-
-            if (mDefensiveMatrix[i][j] >= 0) {
-                mDefensiveMatrix[i][j]++;
-            }
-
-            i++;
-            j++;
-        }
-
-        i = x + 1;
-        j = y + 1;
-        while (i <= x2 && j<=y2) {
-            if (mOffensiveMatrix[i][j] == -1*mStoneColor){
-                break;
-            }
-
-            if (mOffensiveMatrix[i][j] > 0) {
-                mOffensiveMatrix[i][j]--;
-            }
-
-            i++;
-            j++;
-        }
-
-        //Diagonally Up
-        i = x - 1;
-        j = y + 1;
-        while (i >= x1 && j<=y2) {
-            if (mDefensiveMatrix[i][j] == -1*mStoneColor){
-                break;
-            }
-
-            if (mDefensiveMatrix[i][j] >= 0) {
-                mDefensiveMatrix[i][j]++;
-            }
-
-            i--;
-            j++;
-        }
-
-        i = x - 1;
-        j = y + 1;
-        while (i >= x1 && j<=y2) {
-            if (mOffensiveMatrix[i][j] == -1*mStoneColor){
-                break;
-            }
-
-            if (mOffensiveMatrix[i][j] > 0) {
-                mOffensiveMatrix[i][j]--;
-            }
-
-            i--;
-            j++;
-        }
-
-        i = x + 1;
-        j = y - 1;
-        while (i <= x2 && j>=y1) {
-            if (mDefensiveMatrix[i][j] == -1*mStoneColor){
-                break;
-            }
-
-            if (mDefensiveMatrix[i][j] >= 0) {
-                mDefensiveMatrix[i][j]++;
-            }
-
-            i++;
-            j--;
-        }
-
-        i = x + 1;
-        j = y - 1;
-        while (i <= x2 && j>=y1) {
-            if (mOffensiveMatrix[i][j] == -1*mStoneColor){
-                break;
-            }
-
-            if (mOffensiveMatrix[i][j] > 0) {
-                mOffensiveMatrix[i][j]--;
-            }
-
-            i++;
-            j--;
-        }
 
         return true;
     }
 
 
-    public StonePos GetPos(){
-
-        int maxOffensive = 0;
-        int maxDefensive = 0;
-
-        List candidatePos = new ArrayList<StonePos>();
-        Random randomGenerator = new Random();
-
-        int i, j, x, y;
-
-        for(i=0; i<=mBoardSize; i++){
-            for(j=0; j<=mBoardSize; j++){
-                if(mOffensiveMatrix[i][j]>maxOffensive){
-                    maxOffensive = mOffensiveMatrix[i][j];
-                }
-            }
-        }
-
-        for(i=0; i<=mBoardSize; i++){
-            for(j=0; j<=mBoardSize; j++){
-                if(mDefensiveMatrix[i][j]>maxDefensive){
-                    maxDefensive = mDefensiveMatrix[i][j];
-                }
-            }
-        }
-
-        //The opponent current cannot threat us, so we attack
-        if(maxDefensive < 3){
-
-            if(maxOffensive == 0){
-                do{
-                    i = randomGenerator.nextInt(mBoardSize+1);
-                    j = randomGenerator.nextInt(mBoardSize+1);
-                }while(mOffensiveMatrix[i][j]!=0);
-
-                return (new StonePos(i,j));
-            }
-
-            for(i=0; i<=mBoardSize; i++){
-                for(j=0; j<=mBoardSize; j++){
-                    if(mOffensiveMatrix[i][j] == maxOffensive){
-                        StonePos pos = new StonePos(i,j);
-
-                        if(checkForWinner(i, j, mStoneColor)){
-                            return pos;
-                        }
-
-                        candidatePos.add(pos);
-                    }
-                }
-            }
-
-            if(!candidatePos.isEmpty()){
-                i = randomGenerator.nextInt(candidatePos.size());
-
-                return (StonePos)(candidatePos.get(i));
-            }
-
-        }else{
-
-            for(i=0; i<=mBoardSize; i++){
-                for(j=0; j<=mBoardSize; j++){
-                    if(mDefensiveMatrix[i][j] == maxDefensive){
-                        StonePos pos = new StonePos(i,j);
-
-                        if(checkForWinner(i, j, mOpStoneColor)){
-                            return pos;
-                        }
-
-                        candidatePos.add(pos);
-                    }
-                }
-            }
-
-            if(!candidatePos.isEmpty()){
-                i = randomGenerator.nextInt(candidatePos.size());
-
-                return (StonePos)(candidatePos.get(i));
-            }
-
-        }
-
-        return null;
-
-    }
 
     public int getNextPosition (int col, int row, int direction) {
         int nextPosition = 0;
@@ -968,36 +500,35 @@ public class GameAI {
 
     public void PrintMatrix() {
         int i, j;
-        /*
-        System.out.print("--------");
+
         for (i = 0; i <= mBoardSize; i++) {
             for (j = 0; j <= mBoardSize; j++) {
                 System.out.print(mCurBoardMatrix[i][j] + " ");
             }
             System.out.print("\n");
         }
-        */
 
-        System.out.print("--------Offensive Matrix---------\n");
-
-        for (i = 0; i <= mBoardSize; i++) {
-            for (j = 0; j <= mBoardSize; j++) {
-                //System.out.print(mOffensiveMatrix[i][j] + " ");
-                System.out.format("%02d ", mOffensiveMatrix[i][j]);
-            }
-            System.out.print("\n");
-        }
-
-        System.out.print("--------Defensive Matrix---------\n");
-        for (i = 0; i <= mBoardSize; i++) {
-            for (j = 0; j <= mBoardSize; j++) {
-                //System.out.print(mDefensiveMatrix[i][j] + " ");
-                System.out.format("%02d ", mDefensiveMatrix[i][j]);
-            }
-            System.out.print("\n");
-        }
 
         System.out.print("\n");
+    }
+
+
+
+
+    private boolean playerWins(int[][]board, int piece){
+        int R = mBoardSize+1, C = mBoardSize+1;
+
+        for (int i = 0; i < R; i++)
+            for (int j = 0; j < C; j++){
+                if(board[i][j] == piece){
+                    if(checkForWinner(i, j, piece)){
+                        return true;
+                    }
+                }
+
+            }
+
+        return false;
     }
 
 }

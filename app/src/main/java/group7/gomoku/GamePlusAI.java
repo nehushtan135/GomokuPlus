@@ -91,7 +91,7 @@ public class GamePlusAI extends MainActivity implements Runnable {
         final int width = sv.getWidth();
 
         posMatrix = new Position[boardType + 1][boardType + 1];
-        maxNumStone = (boardType+1) * (boardType+1);
+        maxNumStone = (boardType + 1) * (boardType + 1);
         stoneCounter = 0;
 
         //Calculating the size and position of the board
@@ -255,27 +255,37 @@ public class GamePlusAI extends MainActivity implements Runnable {
 
         //AI
         gameAI.putOpStone(col, row);
-        gameAI.PrintMatrix();
-        GameAI.StonePos pos = gameAI.GetPos();
-        if (null != pos) {
-            if (posMatrix[pos.x][pos.y].occupy == 0) {
+        //gameAI.PrintMatrix();
 
-                position = posMatrix[pos.x][pos.y];
-                PutStone(curParty, position);
-                posMatrix[pos.x][pos.y].occupy = curParty;
-                gameAI.putMyStone(pos.x, pos.y);
-                gameAI.PrintMatrix();
+        while (true) {
 
-                if (true == checkForWinner(pos.x, pos.y)) {
-                    resetGame();
-                    return true;
+            GameAI.StonePos pos = gameAI.GetPos2();
+            if (null != pos) {
+                if (posMatrix[pos.x][pos.y].occupy == 0) {
+
+                    position = posMatrix[pos.x][pos.y];
+                    PutStone(curParty, position);
+                    posMatrix[pos.x][pos.y].occupy = curParty;
+                    gameAI.putMyStone(pos.x, pos.y);
+                    //gameAI.PrintMatrix();
+
+                    if (true == checkForWinner(pos.x, pos.y)) {
+                        resetGame();
+                        return true;
+                    }
+
+                    changeTurn();
+                    break;
+
+                } else {
+                    System.out.print("Failed to put stone AI\n");
+                    continue;
                 }
-
-                changeTurn();
-            } else {
-                System.out.print("Failed to put stone AI\n");
-                return false;
             }
+
+            return false;
+
+
         }
 
         return true;
@@ -303,6 +313,7 @@ public class GamePlusAI extends MainActivity implements Runnable {
         position.imageStone.setId((int) (position.x * 10 + position.y));
         position.imageStone.setLayoutParams(lp);
         mLayout.addView(position.imageStone);
+        mLayout.invalidate();
 
         //position.occupy = flag;
     }
@@ -310,8 +321,8 @@ public class GamePlusAI extends MainActivity implements Runnable {
     public void changeTurn() {
         if (curParty == 1) {
             curParty = 2;
-           // iv.setImageResource(R.drawable.stoneblack);
-        }else if(curParty == 2){
+            // iv.setImageResource(R.drawable.stoneblack);
+        } else if (curParty == 2) {
             //iv.setImageResource(R.drawable.stonewhite);
             curParty = 1;
         } else {
@@ -344,12 +355,14 @@ public class GamePlusAI extends MainActivity implements Runnable {
 
         gameAI.reset();
     }
+
     private void displayScore() {
-        TextView whiteView = (TextView)((Activity) context).findViewById(R.id.whiteScore);
-        whiteView.setText("White: "+wScore);
-        TextView blackView = (TextView)((Activity) context).findViewById(R.id.blackScore);
-        blackView.setText("Black: " +bScore);
+        TextView whiteView = (TextView) ((Activity) context).findViewById(R.id.whiteScore);
+        whiteView.setText("White: " + wScore);
+        TextView blackView = (TextView) ((Activity) context).findViewById(R.id.blackScore);
+        blackView.setText("Black: " + bScore);
     }
+
     public Position getNextPosition(int col, int row, int direction) {
         Position nextPosition = new Position();
         switch (direction) {
@@ -587,27 +600,22 @@ public class GamePlusAI extends MainActivity implements Runnable {
     public void displayWinner(int winner, String dir) {
         Toast toast = new Toast(context);
         String who = "";
-        CharSequence msg, msg1;
+        CharSequence msg;
         if (winner == 1) {
-            wScore +=1;
+            wScore += 1;
             who = "White";
-        }
-        else if (winner == 2) {
-            bScore +=1;
+        } else if (winner == 2) {
+            bScore += 1;
             who = "Black";
-        }
-        else if (winner == -1) {
+        } else if (winner == -1) {
             who = "No One";
         }
-        CharSequence fScore = String.format("White %s\nBlack %s",wScore,bScore);
+        CharSequence fScore = String.format("White  %s     Black %s", wScore, bScore);
         displayScore();
-
-        msg1 =String.format("%s Scored!!", who);
         msg = String.format("%s Won!!", who);
         //change for testing to change number of scores needed to win.
-        //todo make this a changable preference but we can leave it at 3 for now
-        if(wScore >= 3 || bScore >=3) {
-            ContextThemeWrapper ctw = new ContextThemeWrapper(context,R.style.customDialog);
+        if (wScore >= 5 || bScore >= 5) {
+            ContextThemeWrapper ctw = new ContextThemeWrapper(context, R.style.customDialog);
             AlertDialog.Builder winDialog = new AlertDialog.Builder(ctw);
             winDialog.setCancelable(false);
             winDialog.setTitle(msg);
@@ -623,23 +631,32 @@ public class GamePlusAI extends MainActivity implements Runnable {
             winDialog.setNegativeButton(R.string.winExit, new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialog, int which) {
-                    finish();
-                    System.exit(0);
+                    Intent intent = new Intent(context, MainActivity.class);
+                    intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                    startActivity(intent);
                 }
             });
             winDialog.create().show();
-        }
-        else{
+        } else {
 
             ContextThemeWrapper mctw = new ContextThemeWrapper(context, R.style.customDialog);
             AlertDialog.Builder singWinDialog1 = new AlertDialog.Builder(mctw);
             singWinDialog1.setCancelable(false);
-            singWinDialog1.setTitle(msg1);
+            singWinDialog1.setTitle(msg);
+
             singWinDialog1.setMessage(fScore);
-            singWinDialog1.setNeutralButton(R.string.winContinue, new DialogInterface.OnClickListener() {
+            singWinDialog1.setPositiveButton(R.string.winReset, new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialog, int which) {
                     resetGame();
+                }
+            });
+            singWinDialog1.setNegativeButton(R.string.winExit, new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    Intent intent = new Intent(context, MainActivity.class);
+                    intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                    startActivity(intent);
                 }
             });
             Dialog dlg = singWinDialog1.create();
@@ -650,5 +667,6 @@ public class GamePlusAI extends MainActivity implements Runnable {
             window.setAttributes(wlp);
             dlg.show();
         }
+
     }
 }

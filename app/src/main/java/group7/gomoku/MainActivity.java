@@ -1,6 +1,7 @@
 package group7.gomoku;
 
 import android.app.Activity;
+import android.bluetooth.BluetoothSocket;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.Menu;
@@ -13,6 +14,8 @@ import android.widget.ImageButton;
 public class MainActivity extends Activity {
 
     boolean muteAudio = false;
+
+    private static BluetoothSocket mSocket;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -31,6 +34,7 @@ public class MainActivity extends Activity {
         stopMusic();
         super.onDestroy();
     }
+
     private void setupOnPlayAiClick() {
         Button seButton = (Button) findViewById(R.id.PlayAiButton);
         seButton.setOnClickListener(new View.OnClickListener() {
@@ -52,15 +56,25 @@ public class MainActivity extends Activity {
 
         });
     }
+
     public void setupOnMultiplayerClick() {
         Button heButton = (Button) findViewById(R.id.MultiplayerButton);
         heButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                 startActivity(new Intent(MainActivity.this, Multiplayerconnection.class));
+                startActivity(new Intent(MainActivity.this, Multiplayerconnection.class));
             }
 
         });
+    }
+
+    public static void setBluetoothSocket(BluetoothSocket Socket) {
+        mSocket = Socket;
+    }
+
+    public void Socketclose() {
+        if (mSocket != null)
+            GameMultiplayer.sendMessage("disconnect,0,0,0");
     }
 
     public void setupOnExitClick() {
@@ -88,13 +102,13 @@ public class MainActivity extends Activity {
         // Handle action bar item clicks here. The action bar will
         // automatically handle clicks on the Home/Up button, so long
         // as you specify a parent activity in AndroidManifest.xml.
-        switch (item.getItemId())
-        {
+        switch (item.getItemId()) {
             case R.id.newgame:
                 startActivity(new Intent(MainActivity.this, NewGame.class));
                 return true;
             case R.id.exit:
                 finish();
+                Socketclose();
                 System.exit(0);
                 return true;
             case R.id.help:
@@ -113,7 +127,7 @@ public class MainActivity extends Activity {
 
     }
 
-    public boolean MuteAudio(View view){
+    public boolean MuteAudio(View view) {
         /**
          * Enable and disable the sound of the app, default state is enable
          * @param View view
@@ -121,12 +135,12 @@ public class MainActivity extends Activity {
          */
         muteAudio = !muteAudio;
 
-        ImageButton btn_mute = (ImageButton)findViewById(R.id.btn_mute);
+        ImageButton btn_mute = (ImageButton) findViewById(R.id.btn_mute);
 
-        if(true == muteAudio){
+        if (true == muteAudio) {
             btn_mute.setImageResource(R.drawable.mute);
             stopMusic();
-        }else{
+        } else {
             btn_mute.setImageResource(R.drawable.unmute);
             playMusic();
         }
@@ -136,13 +150,13 @@ public class MainActivity extends Activity {
     }
 
     //start audio play service and play music
-    public void playMusic(){
+    public void playMusic() {
         Intent intentPlayMusic = new Intent(this, group7.gomoku.ServiceAudioPlay.class);
         startService(intentPlayMusic);
     }
 
     // stop playing music via stop audio play service
-    public void stopMusic(){
+    public void stopMusic() {
         Intent intentPlayMusic = new Intent(this, group7.gomoku.ServiceAudioPlay.class);
         stopService(intentPlayMusic);
     }

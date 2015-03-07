@@ -11,6 +11,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Paint;
+import android.util.Log;
 import android.view.ContextThemeWrapper;
 import android.view.Gravity;
 import android.view.MotionEvent;
@@ -19,10 +20,12 @@ import android.view.SurfaceView;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
+
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -39,7 +42,7 @@ public class GameMultiplayer extends MainActivity implements Runnable {
     SurfaceView sv;
     ImageView iv;
     int curParty;
-    int wScore,bScore;
+    int wScore, bScore;
     Position[][] posMatrix;
     Bitmap mStoneWhiteScale;
     Bitmap mStoneBlackScale;
@@ -53,13 +56,12 @@ public class GameMultiplayer extends MainActivity implements Runnable {
 
     private static BluetoothSocket gameSocket;
     private OutputStream gameOutputStream;
-    private PrintWriter gamePrintWriterOut;
+    private static PrintWriter gamePrintWriterOut;
     private BufferedReader gameBufferedReader;
     private static int who;
 
 
-
-    GameMultiplayer(Context context, SurfaceView sv, int boardType,int wScore, int bScore, int who) {
+    GameMultiplayer(Context context, SurfaceView sv, int boardType, int wScore, int bScore, int who) {
         setupIOStream();
         this.context = context;
         this.sv = sv;
@@ -88,9 +90,8 @@ public class GameMultiplayer extends MainActivity implements Runnable {
         startReceivingThread();
     }
 
-    public static void setBluetoothSocket(BluetoothSocket Socket)
-    {
-        gameSocket=Socket;
+    public static void setBluetoothSocket(BluetoothSocket Socket) {
+        gameSocket = Socket;
     }
 
     public void setupIOStream() {
@@ -105,6 +106,7 @@ public class GameMultiplayer extends MainActivity implements Runnable {
             System.out.println("Error Creating socket");
         }
     }
+
     public void newGame() {
         draw();
     }
@@ -132,7 +134,7 @@ public class GameMultiplayer extends MainActivity implements Runnable {
         final int width = sv.getWidth();
 
         posMatrix = new Position[boardType + 1][boardType + 1];
-        maxNumStone = (boardType+1) * (boardType+1);
+        maxNumStone = (boardType + 1) * (boardType + 1);
         stoneCounter = 0;
 
         //Calculating the size and position of the board
@@ -187,13 +189,13 @@ public class GameMultiplayer extends MainActivity implements Runnable {
         int i = 0;
         int j = 0;
         float posOffset = 0;
-        while (i < boardType+1) {
+        while (i < boardType + 1) {
             posOffset = gridSize * i;
             canvas.drawLine(innerPosLeft + posOffset, innerPosTop, innerPosLeft + posOffset, innerPosBottom, p);
             canvas.drawLine(innerPosLeft, innerPosTop + posOffset, innerPosRight, innerPosTop + posOffset, p);
 
 
-            while (j < boardType+1) {
+            while (j < boardType + 1) {
 
                 if (posMatrix[i][j] == null) {
                     posMatrix[i][j] = new Position();
@@ -298,7 +300,7 @@ public class GameMultiplayer extends MainActivity implements Runnable {
     }
 
     //only startReceivingThread will call this function.
-    public void updateBoard (int flag, int col, int row) {
+    public void updateBoard(int flag, int col, int row) {
         posMatrix[col][row].imageStone = new ImageView(context);
 
         if (flag == 1)
@@ -312,9 +314,9 @@ public class GameMultiplayer extends MainActivity implements Runnable {
                 RelativeLayout.LayoutParams.WRAP_CONTENT, RelativeLayout.LayoutParams.WRAP_CONTENT);
         lp.addRule(RelativeLayout.ALIGN_PARENT_LEFT);
         lp.addRule(RelativeLayout.ALIGN_PARENT_TOP);
-        lp.leftMargin = (int)(posMatrix[col][row].x - gridSize /2 + 0.5f);
-        lp.topMargin = (int)(posMatrix[col][row].y - gridSize /2 + 0.5f);
-        posMatrix[col][row].imageStone.setId((int)(posMatrix[col][row].x * 10 + posMatrix[col][row].y));
+        lp.leftMargin = (int) (posMatrix[col][row].x - gridSize / 2 + 0.5f);
+        lp.topMargin = (int) (posMatrix[col][row].y - gridSize / 2 + 0.5f);
+        posMatrix[col][row].imageStone.setId((int) (posMatrix[col][row].x * 10 + posMatrix[col][row].y));
         posMatrix[col][row].imageStone.setLayoutParams(lp);
 
         mLayout.addView(posMatrix[col][row].imageStone);
@@ -357,9 +359,9 @@ public class GameMultiplayer extends MainActivity implements Runnable {
                 RelativeLayout.LayoutParams.WRAP_CONTENT, RelativeLayout.LayoutParams.WRAP_CONTENT);
         lp.addRule(RelativeLayout.ALIGN_PARENT_LEFT);
         lp.addRule(RelativeLayout.ALIGN_PARENT_TOP);
-        lp.leftMargin = (int)(position.x - gridSize /2 + 0.5f);
-        lp.topMargin = (int)(position.y - gridSize /2 + 0.5f);
-        position.imageStone.setId((int)(position.x * 10 + position.y));
+        lp.leftMargin = (int) (position.x - gridSize / 2 + 0.5f);
+        lp.topMargin = (int) (position.y - gridSize / 2 + 0.5f);
+        position.imageStone.setId((int) (position.x * 10 + position.y));
         position.imageStone.setLayoutParams(lp);
 
         mLayout.addView(position.imageStone);
@@ -368,20 +370,20 @@ public class GameMultiplayer extends MainActivity implements Runnable {
         if (curParty == who) {
             moveMsg = String.format("updateBoard,%d,%d,%d", flag, row, col);
             sendMessage(moveMsg);
-            System.out.printf ("%d sending %s\n", flag, moveMsg);
+            System.out.printf("%d sending %s\n", flag, moveMsg);
         }
 
         //position.occupy = flag;
     }
 
     public void changeTurn() {
-        if(curParty == 1){
+        if (curParty == 1) {
             curParty = 2;
             iv.setImageResource(R.drawable.stoneblack);
-        }else if(curParty == 2){
+        } else if (curParty == 2) {
             iv.setImageResource(R.drawable.stonewhite);
             curParty = 1;
-        }else{
+        } else {
         }
     }
 
@@ -397,9 +399,9 @@ public class GameMultiplayer extends MainActivity implements Runnable {
         //remove the view from the relative layout and reset the PosMatrix
         int i, j;
         for (i = 0; i <= boardType; i++) {
-            for (j = 0; j <= boardType; j++){
-                if(posMatrix != null){
-                    if(posMatrix[i][j].imageStone != null) {
+            for (j = 0; j <= boardType; j++) {
+                if (posMatrix != null) {
+                    if (posMatrix[i][j].imageStone != null) {
                         ((RelativeLayout) posMatrix[i][j].imageStone.getParent()).removeView(posMatrix[i][j].imageStone);
                         posMatrix[i][j].imageStone = null;
                     }
@@ -415,12 +417,13 @@ public class GameMultiplayer extends MainActivity implements Runnable {
     }
 
     private void displayScore() {
-        TextView whiteView = (TextView)((Activity) context).findViewById(R.id.whiteScore);
-        whiteView.setText("White: "+wScore);
-        TextView blackView = (TextView)((Activity) context).findViewById(R.id.blackScore);
-        blackView.setText("Black: " +bScore);
+        TextView whiteView = (TextView) ((Activity) context).findViewById(R.id.whiteScore);
+        whiteView.setText("White: " + wScore);
+        TextView blackView = (TextView) ((Activity) context).findViewById(R.id.blackScore);
+        blackView.setText("Black: " + bScore);
     }
-    public Position getNextPosition (int col, int row, int direction) {
+
+    public Position getNextPosition(int col, int row, int direction) {
         Position nextPosition = new Position();
         switch (direction) {
             case 0:
@@ -463,10 +466,10 @@ public class GameMultiplayer extends MainActivity implements Runnable {
 
     // flag: 1 White
     // flag: 2 Black
-    public void checkForWinner (int col, int row) {
+    public void checkForWinner(int col, int row) {
         int i, winner;
-        int  nextc = col;
-        int  nextr = row;
+        int nextc = col;
+        int nextr = row;
         int[] tmp = new int[11];
         Position curPosition = new Position();
         curPosition = posMatrix[col][row];
@@ -479,19 +482,17 @@ public class GameMultiplayer extends MainActivity implements Runnable {
             if (nextc <= boardType) {
                 curPosition = getNextPosition(nextc, row, 0);
                 tmp[i] = curPosition.occupy;
-            }
-            else
+            } else
                 tmp[i] = -1;
         }
         // fill the left half of tmp buffer |0|1|2|3|4|x|x|x|x|x|x|
         nextc = col;
         for (i = 4; i >= 0; i--) {
             nextc--;
-            if (nextc >=  0) {
+            if (nextc >= 0) {
                 curPosition = getNextPosition(nextc, row, 4);
                 tmp[i] = curPosition.occupy;
-            }
-            else // Since we  have to get 4 positions, we have to put -1
+            } else // Since we  have to get 4 positions, we have to put -1
                 // when it's outside the board.
                 tmp[i] = -1;
         }
@@ -584,7 +585,7 @@ public class GameMultiplayer extends MainActivity implements Runnable {
     // return 1 if white win!!
     // return 2 if black win!!
     // return 0 if no winner!
-    public int isWinner (int []arr) {
+    public int isWinner(int[] arr) {
         int i;
         int same = 1;
         //boolean lookBack = false;
@@ -598,12 +599,11 @@ public class GameMultiplayer extends MainActivity implements Runnable {
         for (i = 0; i < 10; i++) {
             if (arr[i] == arr[i + 1]) {
                 // count the same only for 1 or 2, not 0 or -1.
-                if ((arr [i] == 1 ) || (arr[i] == 2))
+                if ((arr[i] == 1) || (arr[i] == 2))
                     same++;
                 //if ((arr [i] == 0 ) || (arr[i] == -1))
                 //    lookBack = false;
-            }
-            else {
+            } else {
                 same = 1;
             }
             // if this true, then i >= 4;
@@ -614,15 +614,15 @@ public class GameMultiplayer extends MainActivity implements Runnable {
         }
 
         // potential win when 5 stones are the same. Do some more checking.
-        if ((same == 5) && (i <= 10) && (i >=5)) {
+        if ((same == 5) && (i <= 10) && (i >= 5)) {
             if (i < 10) { // don't go out of arr bound.
                 // If right is empty or up to the right end of the board, win.
-                if ((arr[i+1] == 0) || (arr[i+1] == -1)) {
+                if ((arr[i + 1] == 0) || (arr[i + 1] == -1)) {
                     //System.out.printf ("1.Winner: %d\n", arr[i]);
                     return arr[i];
                 }
                 // if right is blocked by the same num, no win.
-                else if (arr[i+1] == arr[i]) {
+                else if (arr[i + 1] == arr[i]) {
                     //System.out.print ("2.No Winner\n");
                     return 0;
                 }
@@ -637,13 +637,12 @@ public class GameMultiplayer extends MainActivity implements Runnable {
                     return 0;
                 }
                 // up to the left end of the board or empty
-                if ((arr[i-5] == -1) || (arr[i-5] == 0)) {
+                if ((arr[i - 5] == -1) || (arr[i - 5] == 0)) {
                     //System.out.printf ("2.Winner: %d\n", arr[i]);
                     return arr[i];
                 }
 
-            }
-            else if (i == 10) {
+            } else if (i == 10) {
                 //System.out.printf ("3.Winner: %d\n", arr[i]);
                 return arr[i];
             }
@@ -652,29 +651,27 @@ public class GameMultiplayer extends MainActivity implements Runnable {
         return 0;
     }
 
-    public void displayWinner (int winner, String dir) {
+    public void displayWinner(int winner, String dir) {
         Toast toast = new Toast(context);
         String who = "";
         CharSequence msg, msg1;
         if (winner == 1) {
-            wScore +=1;
+            wScore += 1;
             who = "White";
-        }
-        else if (winner == 2) {
-            bScore +=1;
+        } else if (winner == 2) {
+            bScore += 1;
             who = "Black";
-        }
-        else if (winner == -1) {
+        } else if (winner == -1) {
             who = "No One";
         }
-        CharSequence fScore = String.format("White %s\nBlack %s",wScore,bScore);
+        CharSequence fScore = String.format("White %s\nBlack %s", wScore, bScore);
         displayScore();
 
-        msg1 =String.format("%s Scored!!", who);
+        msg1 = String.format("%s Scored!!", who);
         msg = String.format("%s Won!!", who);
         //change for testing to change number of scores needed to win.
-        if(wScore >= 3 || bScore >=3) {
-            ContextThemeWrapper ctw = new ContextThemeWrapper(context,R.style.customDialog);
+        if (wScore >= 3 || bScore >= 3) {
+            ContextThemeWrapper ctw = new ContextThemeWrapper(context, R.style.customDialog);
             AlertDialog.Builder winDialog = new AlertDialog.Builder(ctw);
             winDialog.setCancelable(false);
             winDialog.setTitle(msg);
@@ -695,8 +692,7 @@ public class GameMultiplayer extends MainActivity implements Runnable {
                 }
             });
             winDialog.create().show();
-        }
-        else{
+        } else {
 
             ContextThemeWrapper mctw = new ContextThemeWrapper(context, R.style.customDialog);
             AlertDialog.Builder singWinDialog1 = new AlertDialog.Builder(mctw);
@@ -719,7 +715,7 @@ public class GameMultiplayer extends MainActivity implements Runnable {
         }
     }
 
-    public void sendMessage(String str){
+    public static void sendMessage(String str) {
         gamePrintWriterOut.println(str);
         gamePrintWriterOut.flush();
         // System.out.printf("Sent: %s\n", str);
@@ -733,7 +729,7 @@ public class GameMultiplayer extends MainActivity implements Runnable {
             public void run() {
                 while (true) {
                     final String[] msgArray;
-                    msgArray = receiveMessage().split(",",4);
+                    msgArray = receiveMessage().split(",", 4);
                     runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
@@ -745,12 +741,12 @@ public class GameMultiplayer extends MainActivity implements Runnable {
         }).start();
     }
 
-    private String receiveMessage(){
+    private String receiveMessage() {
         String receivedMessage = "";
         try {
             receivedMessage = new String(gameBufferedReader.readLine());
             receivedMessage.trim();
-            System.out.printf ("Received: %s\n", receivedMessage);
+            System.out.printf("Received: %s\n", receivedMessage);
             return receivedMessage;
         } catch (IOException e) {
             System.out.print("error reading stream.");
@@ -764,12 +760,16 @@ public class GameMultiplayer extends MainActivity implements Runnable {
             occupy = Integer.parseInt(msgArray[1]);
             col = Integer.parseInt(msgArray[2]);
             row = Integer.parseInt(msgArray[3]);
-            updateBoard(occupy,col,row);
-        }
-        else if (msgArray[0].equals("changeTurn")){
-            changeTurn();
-        }
-        else
-            System.out.printf ("handleReceived: Not expecting: %s \n", msgArray[0]);
+            updateBoard(occupy, col, row);
+        } else if (msgArray[0].equals("disconnect")) {
+            try {
+                if (gameSocket != null) {
+                    gameSocket.close();
+                    System.exit(0);
+                }
+            } catch (IOException closeException) {
+            }
+        } else
+            System.out.print("handleReceived: Not expecting this msg.\n");
     }
 }

@@ -89,32 +89,6 @@ public class NewGameAI extends MainActivity implements SurfaceHolder.Callback, P
         startActivity(intent);
     }
 
-    /* not using timer anymore but don't want to delete it completely
-        public class CounterClass extends CountDownTimer {
-            public CounterClass (long millisInFuture, long countDownInterval) {
-                super(millisInFuture, countDownInterval);
-            }
-
-            @Override
-            public void onTick (long millisUntilFinished) {
-                long millis = millisUntilFinished;
-                String ms = String.format("%02d:%02d", TimeUnit.MILLISECONDS.toMinutes(millis) - TimeUnit.HOURS.toMinutes(TimeUnit.MILLISECONDS.toHours(millis)),
-                        TimeUnit.MILLISECONDS.toSeconds(millis) - TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes(millis)));
-                //cTime is storing the current time left on the clock into a variable that pauseButton onclicklistener can then store to recover on resume.
-                cTime = ms;
-
-
-                //System.out.println(ms);
-                textViewTime.setText(ms);
-            }
-
-            @Override
-            public void onFinish() {
-
-                textViewTime.setText("DONE.");
-            }
-        }
-        */
     @Override
     public void surfaceCreated(SurfaceHolder holder) {
         mGame.draw();

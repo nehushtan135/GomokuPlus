@@ -275,6 +275,7 @@ import java.util.UUID;
 
                     mmSocket.connect();
                     Multiplayer.setBluetoothSocket(mmSocket);
+                    MainActivity.setBluetoothSocket(mmSocket);
                     Multiplayer.setWho (2); // client!
                     Intent i=new Intent(Multiplayerconnection.this,Multiplayer.class);
                     //finish();
