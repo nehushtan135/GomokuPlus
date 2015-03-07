@@ -1,12 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string-array name="pref_boardsize_entries">
+        <item name="5">5 x 5</item>
         <item name="10">10 x 10</item>
         <item name="15">15 x 15</item>
         <item name="20">20 x 20</item>
     </string-array>
 
     <string-array name="pref_boardsize_values">
+        <item name="5">5</item>
         <item name="10">10</item>
         <item name="15">15</item>
         <item name="20">20</item>

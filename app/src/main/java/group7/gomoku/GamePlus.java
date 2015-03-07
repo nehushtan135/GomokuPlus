@@ -59,6 +59,8 @@ public class GamePlus extends NewGame implements Runnable {
         mStoneWhiteScale = null;
         curParty = 1;
         exitGame = false;
+        maxNumStone = (boardType+1) * (boardType+1);
+        stoneCounter = 0;
         mLayout = (RelativeLayout) (((Activity) context).findViewById(R.id.boardLayout));
         displayScore();
 
@@ -94,10 +96,7 @@ public class GamePlus extends NewGame implements Runnable {
     private void drawBoard(final Canvas canvas) {
         final int height = sv.getHeight();
         final int width = sv.getWidth();
-
         posMatrix = new Position[boardType + 1][boardType + 1];
-        maxNumStone = (boardType+1) * (boardType+1);
-        stoneCounter = 0;
 
         //Calculating the size and position of the board
         float boundWidth = 0;
@@ -264,9 +263,10 @@ public class GamePlus extends NewGame implements Runnable {
         checkForWinner(col, row);
 
         // we have a tie if the board is completely filled.
-        if (stoneCounter == maxNumStone)
+        if (stoneCounter == maxNumStone) {
             displayWinner(-1, "Tie Game.");
-
+            System.out.printf (">>>> %d, %d, stoneCounter, mzxNumStone", stoneCounter, maxNumStone);
+        }
         changeTurn();
         return true;
     }
@@ -329,6 +329,7 @@ public class GamePlus extends NewGame implements Runnable {
             }
         }
         displayScore();
+        stoneCounter = 0;
     }
 
     private void displayScore() {

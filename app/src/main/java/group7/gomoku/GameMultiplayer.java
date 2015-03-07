@@ -71,6 +71,8 @@ public class GameMultiplayer extends MainActivity implements Runnable {
         this.iv = (ImageView) ((Activity) context).findViewById(R.id.turnIndicate);
         mStoneBlackScale = null;
         mStoneWhiteScale = null;
+        maxNumStone = (boardType+1) * (boardType+1);
+        stoneCounter = 0;
         curParty = 1;
 
         // 1: Server
@@ -134,8 +136,6 @@ public class GameMultiplayer extends MainActivity implements Runnable {
         final int width = sv.getWidth();
 
         posMatrix = new Position[boardType + 1][boardType + 1];
-        maxNumStone = (boardType + 1) * (boardType + 1);
-        stoneCounter = 0;
 
         //Calculating the size and position of the board
         float boundWidth = 0;
@@ -411,7 +411,7 @@ public class GameMultiplayer extends MainActivity implements Runnable {
             }
         }
         displayScore();
-
+        stoneCounter = 0;
         // White goes first again!
         curParty = 1;
     }

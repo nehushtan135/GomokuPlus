@@ -57,6 +57,8 @@ public class GamePlusAI extends MainActivity implements Runnable {
         mStoneWhiteScale = null;
         curParty = 1;
         exitGame = false;
+        maxNumStone = (boardType+1) * (boardType+1);
+        stoneCounter = 0;
         mLayout = (RelativeLayout) (((Activity) context).findViewById(R.id.boardLayout));
         displayScore();
         addListenerOnBoard();
@@ -91,8 +93,6 @@ public class GamePlusAI extends MainActivity implements Runnable {
         final int width = sv.getWidth();
 
         posMatrix = new Position[boardType + 1][boardType + 1];
-        maxNumStone = (boardType + 1) * (boardType + 1);
-        stoneCounter = 0;
 
         //Calculating the size and position of the board
         float boundWidth = 0;
@@ -350,7 +350,7 @@ public class GamePlusAI extends MainActivity implements Runnable {
             }
         }
         displayScore();
-
+        stoneCounter = 0;
         curParty = 1;
 
         gameAI.reset();
