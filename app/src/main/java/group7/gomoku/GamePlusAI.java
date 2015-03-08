@@ -57,6 +57,8 @@ public class GamePlusAI extends MainActivity implements Runnable {
         mStoneWhiteScale = null;
         curParty = 1;
         exitGame = false;
+        maxNumStone = (boardType+1) * (boardType+1);
+        stoneCounter = 0;
         mLayout = (RelativeLayout) (((Activity) context).findViewById(R.id.boardLayout));
         displayScore();
         addListenerOnBoard();
@@ -91,8 +93,6 @@ public class GamePlusAI extends MainActivity implements Runnable {
         final int width = sv.getWidth();
 
         posMatrix = new Position[boardType + 1][boardType + 1];
-        maxNumStone = (boardType+1) * (boardType+1);
-        stoneCounter = 0;
 
         //Calculating the size and position of the board
         float boundWidth = 0;
@@ -255,8 +255,11 @@ public class GamePlusAI extends MainActivity implements Runnable {
 
         //AI
         gameAI.putOpStone(col, row);
-        gameAI.PrintMatrix();
-        GameAI.StonePos pos = gameAI.GetPos();
+        //gameAI.PrintMatrix();
+
+        while (true) {
+
+            GameAI.StonePos pos = gameAI.GetPos2();
         if (null != pos) {
             if (posMatrix[pos.x][pos.y].occupy == 0) {
 
@@ -264,7 +267,7 @@ public class GamePlusAI extends MainActivity implements Runnable {
                 PutStone(curParty, position);
                 posMatrix[pos.x][pos.y].occupy = curParty;
                 gameAI.putMyStone(pos.x, pos.y);
-                gameAI.PrintMatrix();
+                    //gameAI.PrintMatrix();
 
                 if (true == checkForWinner(pos.x, pos.y)) {
                     resetGame();
@@ -272,10 +275,17 @@ public class GamePlusAI extends MainActivity implements Runnable {
                 }
 
                 changeTurn();
+                    break;
+
             } else {
                 System.out.print("Failed to put stone AI\n");
-                return false;
+                    continue;
             }
+        }
+
+            return false;
+
+
         }
 
         return true;
@@ -303,6 +313,7 @@ public class GamePlusAI extends MainActivity implements Runnable {
         position.imageStone.setId((int) (position.x * 10 + position.y));
         position.imageStone.setLayoutParams(lp);
         mLayout.addView(position.imageStone);
+        mLayout.invalidate();
 
         //position.occupy = flag;
     }
@@ -339,7 +350,7 @@ public class GamePlusAI extends MainActivity implements Runnable {
             }
         }
         displayScore();
-
+        stoneCounter = 0;
         curParty = 1;
 
         gameAI.reset();

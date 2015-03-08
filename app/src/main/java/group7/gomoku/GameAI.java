@@ -80,7 +80,7 @@ public class GameAI {
     }
 
 
-    public StonePos GetPos() {
+    public StonePos GetPos2() {
 
         Node res;
         if (mStoneColor == BLACK_PIECE) {
