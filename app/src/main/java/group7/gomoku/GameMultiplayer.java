@@ -761,7 +761,11 @@ public class GameMultiplayer extends MainActivity implements Runnable {
             col = Integer.parseInt(msgArray[2]);
             row = Integer.parseInt(msgArray[3]);
             updateBoard(occupy, col, row);
-        } else if (msgArray[0].equals("disconnect")) {
+        }
+        else if (msgArray[0].equals("changeTurn")){
+            changeTurn();
+        }
+        else if (msgArray[0].equals("disconnect")) {
             try {
                 if (gameSocket != null) {
                     gameSocket.close();
