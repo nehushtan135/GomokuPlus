@@ -245,11 +245,11 @@ public class GamePlusAI extends MainActivity implements Runnable {
         PutStone(flag, position);
         posMatrix[col][row].occupy = flag;
         stoneCounter++;
-
-        if (true == checkForWinner(col, row)) {
-            resetGame();
-            return true;
-        }
+        checkForWinner(col, row);
+        //if (true == checkForWinner(col, row)) {
+        //    resetGame();
+        //    return true;
+        //}
 
         changeTurn();
 
@@ -260,28 +260,29 @@ public class GamePlusAI extends MainActivity implements Runnable {
         while (true) {
 
             GameAI.StonePos pos = gameAI.GetPos2();
-        if (null != pos) {
-            if (posMatrix[pos.x][pos.y].occupy == 0) {
+            if (null != pos) {
+                if (posMatrix[pos.x][pos.y].occupy == 0) {
 
-                position = posMatrix[pos.x][pos.y];
-                PutStone(curParty, position);
-                posMatrix[pos.x][pos.y].occupy = curParty;
-                gameAI.putMyStone(pos.x, pos.y);
+                    position = posMatrix[pos.x][pos.y];
+                    PutStone(curParty, position);
+                    posMatrix[pos.x][pos.y].occupy = curParty;
+                    gameAI.putMyStone(pos.x, pos.y);
                     //gameAI.PrintMatrix();
+                    stoneCounter++;
+                    checkForWinner(pos.x, pos.y);
 
-                if (true == checkForWinner(pos.x, pos.y)) {
-                    resetGame();
-                    return true;
-                }
+                    // we have a tie if the board is completely filled.
+                    if (stoneCounter == maxNumStone)
+                        displayWinner(-1, "This Game.");
 
-                changeTurn();
+                    changeTurn();
                     break;
 
-            } else {
-                System.out.print("Failed to put stone AI\n");
+                } else {
+                    System.out.print("Failed to put stone AI\n");
                     continue;
+                }
             }
-        }
 
             return false;
 
